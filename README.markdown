@@ -37,6 +37,8 @@ Scalatra is a tiny, [Sinatra](http://www.sinatrarb.com/)-like web framework for 
 
   7. Start hacking on `src/main/scala/MyScalatraFilter.scala`.
 
+  '''There is an issue with running websockets and sbt's jetty. For a working version of the websocket example deploy it to a jetty distribution'''
+
 ## Community
 
 ### Mailing list

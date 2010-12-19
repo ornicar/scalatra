@@ -36,11 +36,11 @@ class ScalatraProject(info: ProjectInfo)
     val servletApi = "javax.servlet" % "servlet-api" % "2.5" % "provided"
 
     override def pomExtra = (
-      <parent>
-        <groupId>{organization}</groupId>
-        <artifactId>{ScalatraProject.this.artifactID}</artifactId>
-        <version>{version}</version>
-      </parent>
+//      <parent>
+//        <groupId>{organization}</groupId>
+//        <artifactId>{ScalatraProject.this.artifactID}</artifactId>
+//        <version>{version}</version>
+//      </parent>
       <name>{name}</name>
       <description>{description}</description>)
 
@@ -70,6 +70,7 @@ class ScalatraProject(info: ProjectInfo)
   lazy val core = project("core", "scalatra", new CoreProject(_))
   class CoreProject(info: ProjectInfo) extends DefaultProject(info) with ScalatraSubProject with TestWithScalatraTest {
     val mockito = "org.mockito" % "mockito-all" % "1.8.4" % "test"
+    val jetty7 = jettyGroupId % "jetty-websocket" % jettyVersion % "provided"
     val description = "The core Scalatra library"
   }
 
@@ -95,7 +96,8 @@ class ScalatraProject(info: ProjectInfo)
   lazy val example = project("example", "scalatra-example", new ExampleProject(_), core, fileupload, scalate, auth)
   class ExampleProject(info: ProjectInfo) extends DefaultWebProject(info) with ScalatraSubProject with UnpublishedProject {
     val jetty7 = jettyGroupId % "jetty-webapp" % jettyVersion % "test"
-    val sfl4japi = "org.slf4j" % "slf4j-api" % slf4jVersion % "compile" 
+    val jettyWebSocket = jettyGroupId % "jetty-websocket" % jettyVersion % "compile"
+    val sfl4japi = "org.slf4j" % "slf4j-api" % slf4jVersion % "compile"
     val sfl4jnop = "org.slf4j" % "slf4j-nop" % slf4jVersion % "runtime"
     val description = "An example Scalatra application"
   }

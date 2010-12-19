@@ -33,7 +33,7 @@ trait ScalatraKernel extends Handler with Initializable
 {
   protected val Routes: ConcurrentMap[String, List[Route]] = {
     val map = new ConcurrentHashMap[String, List[Route]]
-    httpMethods foreach { x: String => map += ((x, List[Route]())) }
+    ( "WS" :: httpMethods) foreach { x: String => map += ((x, List[Route]())) }
     map
   }
 
@@ -120,15 +120,22 @@ trait ScalatraKernel extends Handler with Initializable
           finally {
             afterFilters foreach { _() }
           }
-          renderResponse(result)
+          if(!isWebSocketUpgrade) renderResponse(result)
         }
       }
     }
   }
 
-  protected def effectiveMethod = request.getMethod.toUpperCase match {
-    case "HEAD" => "GET"
-    case x => x
+  protected def isWebSocketUpgrade = request.getHeader("Upgrade") == "WebSocket"
+
+  protected def effectiveMethod = {
+    if(isWebSocketUpgrade) "WS"
+    else {
+      request.getMethod.toUpperCase match {
+        case "HEAD" => "GET"
+        case x => x
+      }
+    }
   }
   
   def requestPath: String
@@ -202,7 +209,7 @@ trait ScalatraKernel extends Handler with Initializable
   def halt(code: Int, msg: String) = throw new HaltException(Some(code), Some(msg))
   def halt(code: Int) = throw new HaltException(Some(code), None)
   def halt() = throw new HaltException(None, None)
-  private case class HaltException(val code: Option[Int], val msg: Option[String]) extends RuntimeException
+  case class HaltException(code: Option[Int], msg: Option[String]) extends RuntimeException
 
   def pass() = throw new PassException
   protected[scalatra] class PassException extends RuntimeException
