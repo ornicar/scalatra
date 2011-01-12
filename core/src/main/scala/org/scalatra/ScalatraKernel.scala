@@ -33,7 +33,7 @@ trait ScalatraKernel extends Handler with Initializable
 {
   protected val Routes: ConcurrentMap[String, List[Route]] = {
     val map = new ConcurrentHashMap[String, List[Route]]
-    ( "WS" :: httpMethods) foreach { x: String => map += ((x, List[Route]())) }
+    ( "SocketIO" :: httpMethods) foreach { x: String => map += ((x, List[Route]())) }
     map
   }
 

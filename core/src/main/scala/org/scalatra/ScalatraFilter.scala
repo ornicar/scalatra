@@ -34,7 +34,7 @@ trait ScalatraFilter extends Filter with ScalatraKernel with Initializable {
 
   override def initialize(config: FilterConfig): Unit = {
     super.initialize(config)
-    servletContext = config.getServletContext    
+    servletContext = config.getServletContext
   }
 
   def destroy = {}

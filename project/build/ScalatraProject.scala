@@ -70,7 +70,6 @@ class ScalatraProject(info: ProjectInfo)
   lazy val core = project("core", "scalatra", new CoreProject(_))
   class CoreProject(info: ProjectInfo) extends DefaultProject(info) with ScalatraSubProject with TestWithScalatraTest {
     val mockito = "org.mockito" % "mockito-all" % "1.8.4" % "test"
-    val jetty7 = jettyGroupId % "jetty-websocket" % jettyVersion % "provided"
     val description = "The core Scalatra library"
   }
 
@@ -78,6 +77,13 @@ class ScalatraProject(info: ProjectInfo)
   class AuthProject(info: ProjectInfo) extends DefaultProject(info) with ScalatraSubProject with TestWithScalatraTest {
     val mockito = "org.mockito" % "mockito-all" % "1.8.4" % "test"
     val description = "Supplies optional Scalatra authentication support"
+  }
+
+  lazy val socketio = project("socketio", "scalatra-socketio", new SocketIOProject(_), core)
+  class SocketIOProject(info: ProjectInfo) extends DefaultProject(info) with ScalatraSubProject with TestWithScalatraTest {
+    val mockito = "org.mockito" % "mockito-all" % "1.8.4" % "test"
+    val jetty7websocket = jettyGroupId % "jetty-websocket" % jettyVersion % "provided"
+    val description = "Supplies optional SocketIO support for scalatra"
   }
 
   lazy val fileupload = project("fileupload", "scalatra-fileupload", new FileuploadProject(_), core)
@@ -93,7 +99,7 @@ class ScalatraProject(info: ProjectInfo)
     val description = "Supplies the optional Scalatra Scalate support"
   }
 
-  lazy val example = project("example", "scalatra-example", new ExampleProject(_), core, fileupload, scalate, auth)
+  lazy val example = project("example", "scalatra-example", new ExampleProject(_), core, fileupload, scalate, auth, socketio)
   class ExampleProject(info: ProjectInfo) extends DefaultWebProject(info) with ScalatraSubProject with UnpublishedProject {
     val jetty7 = jettyGroupId % "jetty-webapp" % jettyVersion % "test"
     val jettyWebSocket = jettyGroupId % "jetty-websocket" % jettyVersion % "compile"

@@ -14,7 +14,7 @@
     </servlet>
     <servlet>
         <servlet-name>WebSocketExample</servlet-name>
-        <servlet-class>org.scalatra.WebSocketExample</servlet-class>
+        <servlet-class>org.scalatra.SocketIOExample</servlet-class>
     </servlet>
 
   <servlet-mapping>

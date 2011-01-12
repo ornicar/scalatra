@@ -1,6 +1,6 @@
 package org.scalatra
 
-class WebSocketExample extends ScalatraServlet with WebSocketSupport {
+class SocketIOExample extends ScalatraServlet with SocketIOSupport {
 
   // overriden because otherwise you need a trailing slash for the root url
   // prefer the freedom with or without root.
@@ -9,7 +9,7 @@ class WebSocketExample extends ScalatraServlet with WebSocketSupport {
     if(p.isEmpty) "/" else p
   }
 
-  ws("/?") { builder =>
+  socketio("/?") { builder =>
     builder.onMessage { (webSocket, msg) =>
       webSocket.sendMessage("ECHO: %s" format msg)
     }
