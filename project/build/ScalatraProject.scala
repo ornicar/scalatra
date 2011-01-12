@@ -83,6 +83,9 @@ class ScalatraProject(info: ProjectInfo)
   class SocketIOProject(info: ProjectInfo) extends DefaultProject(info) with ScalatraSubProject with TestWithScalatraTest {
     val mockito = "org.mockito" % "mockito-all" % "1.8.4" % "test"
     val jetty7websocket = jettyGroupId % "jetty-websocket" % jettyVersion % "provided"
+
+    val codaHaleRepo = "Coda Hale Repo" at "http://repo.codahale.com"
+    val jerkson = "com.codahale" %% "jerkson" % "0.1.3" % "provided"
     val description = "Supplies optional SocketIO support for scalatra"
   }
 

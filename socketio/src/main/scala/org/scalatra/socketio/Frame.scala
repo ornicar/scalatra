@@ -2,13 +2,14 @@ package org.scalatra
 package socketio
 
 import util.RicherString._
+import SocketIO._
 
 object Frame {
 
-  private val FRAME = "~m~"
-  private val HEARTBEAT_FRAME = "~h~"
-  private val JSON_FRAME = "~j~"
-  private val FRAME_SEPARATOR = "~"
+  private[socketio] val FRAME = "~m~"
+  private[socketio] val HEARTBEAT_FRAME = "~h~"
+  private[socketio] val JSON_FRAME = "~j~"
+  private[socketio] val FRAME_SEPARATOR = "~"
 
   def decode(data: String): List[String] = {
     val parts = data.split(FRAME).drop(1)
@@ -21,8 +22,8 @@ object Frame {
     }
   }
 
-  def encode(message: String*): String = {
-    ""
+  def encode(messages: String*): List[String] = {
+    messages map { SocketIOData(_).toString } toList
   }
 }
 class Frame
