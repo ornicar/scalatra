@@ -1,6 +1,7 @@
 package org
 
 import javax.servlet.http.HttpSession
+import scalatra.util.RicherString
 
 package object scalatra {
   /**
@@ -13,4 +14,6 @@ package object scalatra {
     def setAttribute(name: String, value: AnyRef): Unit
     def removeAttribute(name: String): Unit
   }
+
+  implicit def string2RicherString(s: String) = new RicherString(s)
 }

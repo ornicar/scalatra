@@ -33,7 +33,7 @@ trait ScalatraKernel extends Handler with Initializable
 {
   protected val Routes: ConcurrentMap[String, List[Route]] = {
     val map = new ConcurrentHashMap[String, List[Route]]
-    ( "SocketIO" :: httpMethods) foreach { x: String => map += ((x, List[Route]())) }
+    httpMethods foreach { x: String => map += ((x, List[Route]())) }
     map
   }
 
@@ -120,21 +120,16 @@ trait ScalatraKernel extends Handler with Initializable
           finally {
             afterFilters foreach { _() }
           }
-          if(!isWebSocketUpgrade) renderResponse(result)
+          renderResponse(result)
         }
       }
     }
   }
 
-  protected def isWebSocketUpgrade = request.getHeader("Upgrade") == "WebSocket"
-
   protected def effectiveMethod = {
-    if(isWebSocketUpgrade) "WS"
-    else {
-      request.getMethod.toUpperCase match {
-        case "HEAD" => "GET"
-        case x => x
-      }
+    request.getMethod.toUpperCase match {
+      case "HEAD" => "GET"
+      case x => x
     }
   }
   

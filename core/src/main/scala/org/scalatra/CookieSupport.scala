@@ -4,7 +4,6 @@ import collection._
 import java.util.Locale
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse, Cookie => ServletCookie}
 import scala.util.DynamicVariable
-import util.RicherString._
 
 case class CookieOptions(
         domain  : String  = "",

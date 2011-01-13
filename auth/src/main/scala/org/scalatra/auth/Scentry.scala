@@ -4,7 +4,6 @@ package auth
 import collection.mutable.{ HashMap, Map => MMap }
 import scala.PartialFunction
 import ScentryAuthStore.{SessionAuthStore, ScentryAuthStore}
-import util.RicherString
 
 object Scentry {
 
@@ -25,8 +24,6 @@ class Scentry[UserType <: AnyRef](
         app: ScalatraKernel,
         serialize: PartialFunction[UserType, String],
         deserialize: PartialFunction[String, UserType] ) {
-
-  import RicherString._
 
   type StrategyType = ScentryStrategy[UserType]
   type StrategyFactory = ScalatraKernel => StrategyType

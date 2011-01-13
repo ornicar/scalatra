@@ -5,8 +5,6 @@ package strategy
 import javax.servlet.http.HttpServletRequest
 import org.scalatra.auth.{ScentrySupport, ScentryStrategy}
 import net.iharder.Base64
-import util.RicherString
-import RicherString._
 import java.nio.charset.Charset
 import java.util.Locale
 
