@@ -40,8 +40,10 @@ trait SocketIOSupport extends Initializable { self: ScalatraKernel =>
   get("/socket.io.js") {
     contentType = "text/javascript"
     val is = getClass.getClassLoader.getResourceAsStream("org/scalatra/socketio/socket.io.js")
+    val p = request.getServletPath.substring(1)
     Source.fromInputStream(is).getLines foreach { line =>
-      response.getWriter.println(line.replace("'socket.io'", "'%'" format request.getServletPath.substring(1)))
+      response.getWriter.println(
+        line.replace("'socket.io'", "'%'" format p).replace("socket.io/WebSocketMain", "%s/WebSocketMain" format p))
     }
     Unit
   }

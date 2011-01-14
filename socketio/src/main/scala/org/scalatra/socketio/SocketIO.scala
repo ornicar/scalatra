@@ -145,7 +145,10 @@ object SocketIO {
     /**
      * @return The name of the transport instance.
      */
-    val name: Symbol = Symbol(getClass.getName.reverse.substring(0, 9).reverse.toLowerCase(Locale.ENGLISH))
+    val name: Symbol = {
+      val nm = getClass.getSimpleName
+      Symbol(nm.substring(0, nm.length - 9).toLowerCase(Locale.ENGLISH))
+    }
 
     def init(config: Initializable#Config) {}
 
