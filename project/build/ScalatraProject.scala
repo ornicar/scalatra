@@ -85,7 +85,7 @@ class ScalatraProject(info: ProjectInfo)
     val jetty7websocket = jettyGroupId % "jetty-websocket" % jettyVersion % "provided"
 
     val codaHaleRepo = "Coda Hale Repo" at "http://repo.codahale.com"
-    val jerkson = "com.codahale" %% "jerkson" % "0.1.3" % "provided"
+    val jerkson = "com.codahale" %% "jerkson" % "0.1.3" % "compile"
     val description = "Supplies optional SocketIO support for scalatra"
   }
 
@@ -104,7 +104,7 @@ class ScalatraProject(info: ProjectInfo)
 
   lazy val example = project("example", "scalatra-example", new ExampleProject(_), core, fileupload, scalate, auth, socketio)
   class ExampleProject(info: ProjectInfo) extends DefaultWebProject(info) with ScalatraSubProject with UnpublishedProject {
-    val jetty7 = jettyGroupId % "jetty-webapp" % jettyVersion % "test"
+    val jetty7 = jettyGroupId % "jetty-webapp" % jettyVersion % "compile"
     val jettyWebSocket = jettyGroupId % "jetty-websocket" % jettyVersion % "compile"
     val sfl4japi = "org.slf4j" % "slf4j-api" % slf4jVersion % "compile"
     val sfl4jnop = "org.slf4j" % "slf4j-nop" % slf4jVersion % "runtime"

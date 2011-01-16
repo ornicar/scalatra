@@ -11,21 +11,38 @@ trait SocketIOSupport extends Initializable { self: ScalatraKernel =>
   private var _socketIO: SocketIO = _
   private var _builder: SocketIOConnection = null
 
+  before {
+    println(request.getRequestURI)
+  }
+
   abstract override def initialize(config: Config) = {
-    val bufferSize = Option(config.getInitParameter(BUFFER_SIZE_INIT_PARAM).toInt) getOrElse BUFFER_SIZE_DEFAULT
-    val maxIdleTime = Option(config.getInitParameter(MAX_IDLE_TIME_INIT_PARAM).toInt) getOrElse MAX_IDLE_TIME_DEFAULT
+    val bufferSize = (Option(config.getInitParameter(BUFFER_SIZE_INIT_PARAM)) getOrElse BUFFER_SIZE_DEFAULT.toString).toInt
+    val maxIdleTime = (Option(config.getInitParameter(MAX_IDLE_TIME_INIT_PARAM)) getOrElse MAX_IDLE_TIME_DEFAULT.toString).toInt
     _socketIO = new SocketIO(bufferSize, maxIdleTime)
     _socketIO.init(config)
   }
 
-  get("/?") {
-    halt(400, "Missing SocketIO transport")
-  }
+//  get("/?") {
+//    halt(400, "Missing SocketIO transport")
+//  }
 
-  get("/:transport(/:sessionId)?") {
+  get("/:transport") {
     val transport = params.get('transport) getOrElse "unknown"
+    println("selected transport: " + transport)
     if (! _socketIO.isValidTransport(transport)) halt(400, "Unknown SocketIO transport")
     else {
+      println("handling transport [%s]" format transport)
+      _socketIO.handle(transport,
+        ClientConfig(TransportConfig(request, response), SessionConfig(None), _builder.result))
+    }
+  }
+
+  get("/:transport/:sessionId?") {
+    val transport = params.get('transport) getOrElse "unknown"
+    println("selected transport: " + transport)
+    if (! _socketIO.isValidTransport(transport)) halt(400, "Unknown SocketIO transport")
+    else {
+      println("handling transport [%s]" format transport)
       _socketIO.handle(transport,
         ClientConfig(TransportConfig(request, response), SessionConfig(params.get('sessionId)), _builder.result))
     }
@@ -39,18 +56,16 @@ trait SocketIOSupport extends Initializable { self: ScalatraKernel =>
 
   get("/socket.io.js") {
     contentType = "text/javascript"
-    val is = getClass.getClassLoader.getResourceAsStream("org/scalatra/socketio/socket.io.js")
     val p = request.getServletPath.substring(1)
-    Source.fromInputStream(is).getLines foreach { line =>
+    Source.fromInputStream(getClass.getClassLoader.getResourceAsStream("socket.io.js")).getLines foreach { line =>
       response.getWriter.println(
-        line.replace("'socket.io'", "'%'" format p).replace("socket.io/WebSocketMain", "%s/WebSocketMain" format p))
+        line.replace("'socket.io'", "'%s'" format p).replace("socket.io/WebSocketMain", "%s/WebSocketMain" format p))
     }
-    Unit
   }
 
   get("/WebSocketMain.swf") {
     contentType = "application/x-shockwave-flash"
-    val is = getClass.getClassLoader.getResourceAsStream("org/scalatra/socketio/WebSocketMain.swf")
+    val is = getClass.getClassLoader.getResourceAsStream("WebSocketMain.swf")
     val os = response.getOutputStream
     IO.copy(is, os)
   }

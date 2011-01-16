@@ -13,7 +13,7 @@
         <servlet-class>org.scalatra.BasicAuthExample</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>WebSocketExample</servlet-name>
+        <servlet-name>SocketIOExample</servlet-name>
         <servlet-class>org.scalatra.SocketIOExample</servlet-class>
     </servlet>
 
@@ -26,8 +26,8 @@
     <url-pattern>/auth/*</url-pattern>
   </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>WebSocketExample</servlet-name>
-        <url-pattern>/websocket/*</url-pattern>
+        <servlet-name>SocketIOExample</servlet-name>
+        <url-pattern>/socket.io/*</url-pattern>
     </servlet-mapping>
   <servlet-mapping>
     <servlet-name>default</servlet-name>

@@ -78,14 +78,19 @@ class WebSocketTransport(bufferSize: Int, maxIdleTime: Int) extends Transport {
   wsFactory.setBufferSize(bufferSize)
 
   def handle(config: ClientConfig) = {
+    println("in websocket transport handle with\n%s" format config)
     request = config.transport.request
     response = config.transport.response
-    if (config.transport.request.isWebSocketUpgrade && config.session.sessionId.isDefined) {
+    val connection = if (config.transport.request.isWebSocketUpgrade && config.session.sessionId.isDefined) {
+      println("upgrading transport request")
       Option(doUpgrade(config))
     } else {
+      println("Invalid websocket transport request")
       webSocketError("Invalid %s transport request" format name.name)
       None
     }
+    println("Created connection with: %s" format connection)
+    connection
   }
 
 
@@ -108,8 +113,10 @@ class WebSocketTransport(bufferSize: Int, maxIdleTime: Int) extends Transport {
 
     }
     if (websocket == null) {
+      println("websocket couldn't be created")
       webSocketError()
     } else {
+      println("wsfactory doing upgrade of request")
       wsFactory.upgrade(request, response, websocket, origin, protocol)
     }
     websocket

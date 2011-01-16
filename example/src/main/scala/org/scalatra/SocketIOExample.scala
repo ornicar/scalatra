@@ -1,6 +1,8 @@
 package org.scalatra
 
-class SocketIOExample extends ScalatraServlet with SocketIOSupport {
+import socketio.{SocketIOServlet}
+
+class SocketIOExample extends SocketIOServlet {
 
   // overriden because otherwise you need a trailing slash for the root url
   // prefer the freedom with or without root.
@@ -9,24 +11,34 @@ class SocketIOExample extends ScalatraServlet with SocketIOSupport {
     if(p.isEmpty) "/" else p
   }
 
-  socketio("/?") { builder =>
-    builder.onMessage { (webSocket, msg) =>
-      webSocket.sendMessage("ECHO: %s" format msg)
+  socketio { builder =>
+    builder.connecting { connection =>
+      println("Connecting client [%s]." format connection.id )
+    }
+    builder.onMessage { (connection, msg) =>
+      connection.send("ECHO: %s" format msg)
+    }
+    builder.disconnect { (connection, reason) =>
+      println("Client [%s] disconnected because of [%s]." format (connection.id, reason))
     }
   }
 
   get("/?") {
     <html>
-      <head><title>WebSocket connection</title></head>
+      <head>
+        <title>Socket.IO connection</title>
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+      </head>
       <body>
         <h1>Hello</h1>
         <p>In a javascript console</p>
         <pre>
-          var ws = new WebSocket("ws://localhost:8080/websocket")
-          ws.onmessage = { "function(m) { console.log(m.data); };" }
-          ws.send("hello scalatra");
+          var socket = new io.Socket("localhost");
+          socket.on('connect', { "function() { console.log('Connecting to socket') }" });
+          socket.on('message', { "function(m) { console.log(m.data); }" });
+          socket.send("hello scalatra");
           // Some time passes
-          ws.close()
+          socket.close()
         </pre>
       </body>
     </html>

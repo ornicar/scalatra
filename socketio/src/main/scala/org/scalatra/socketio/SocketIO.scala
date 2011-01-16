@@ -3,13 +3,12 @@ package socketio
 
 import com.codahale.jerkson.{Json, ParsingException}
 import transport.{FlashSocketTransport, WebSocketTransport}
-import collection.mutable.{SynchronizedMap, HashMap, Map}
+import collection.mutable.Map
 import socketio.SocketIO.Transport
 import java.util.Locale
 import socketio.SocketIOClient.ClientConfig
 import java.util.concurrent._
 import collection.JavaConversions._
-import javax.servlet.{ServletContext, ServletConfig}
 
 object SocketIO {
 
@@ -138,7 +137,7 @@ object SocketIO {
   }
 
   type MessageHandler = (SocketIOClient, SocketIOData) => Unit
-  type ConnectingHandler = (SocketIOClient) => Boolean
+  type ConnectingHandler = (SocketIOClient) => Unit
   type DisconnectedHandler = (SocketIOClient, DisconnectReason) => Unit
 
   trait Transport {
@@ -161,7 +160,8 @@ object SocketIO {
 
 }
 
-class SocketIO( bufferSize: Int, maxIdleTime: Int) {
+class SocketIO(bufferSize: Int, maxIdleTime: Int) {
+  import SocketIO._
   private val _transports: ConcurrentHashMap[Symbol, Transport] = new ConcurrentHashMap[Symbol, Transport]
 
   private val _sessions = new ConcurrentHashMap[String, SocketIOSession]
@@ -186,18 +186,24 @@ class SocketIO( bufferSize: Int, maxIdleTime: Int) {
     _sessions.get(sessionId)
   }
 
-  def handle(transportName: String, config: ClientConfig) = {
-    Option(_transports.get(Symbol(transportName.toLowerCase(Locale.ENGLISH)).asInstanceOf[Transport])) flatMap {
+  def handle(transportName: String, config: ClientConfig) {
+    println("handling transport with: %s" format config)
+    Option(_transports.get(Symbol(transportName.toLowerCase(Locale.ENGLISH))).asInstanceOf[Transport]) flatMap {
       transport =>
-        transport handle config.copy(
+        val sessionOpt = transport handle config.copy(
           transport = config.transport.copy(
-            getSession = Some(sessId => if(_sessions.containsKey(sessId.toLowerCase(Locale.ENGLISH))) {
+            getSession = Some(sessId => if (_sessions.containsKey(sessId.toLowerCase(Locale.ENGLISH))) {
               Option(_sessions.get(sessId.toLowerCase(Locale.ENGLISH)))
             } else None),
             addSession = Some(sess => _sessions.put(sess.id.toLowerCase(Locale.ENGLISH), sess))),
           session = config.session.copy(
             broadcast = Some((id, message) => _sessions.filterKeys(_ != id).values.foreach(_.send(message))),
             sessionId = Some(config.session.sessionId getOrElse GenerateId())))
+        sessionOpt foreach { sess =>
+          _sessions.put(sess.id, sess)
+          sess.send(StringData(sess.id).toString)
+        }
+        sessionOpt
     }
   }
 

@@ -53,6 +53,7 @@ object SocketIOClient {
 }
 trait SocketIOClient {
 
+  val id: String
   protected val config: ConnectionConfig
 
   protected[socketio] def onMessage(data: SocketIOData) { config.messageHandler(this, data) }
@@ -163,7 +164,7 @@ trait SocketIOSession {
 
       def broadcast(message: String) { broadcaster(message) }
 
-      def send(message: String) { sender(message) }
+      def send(message: String) { encode(message) foreach { sender } }
     }
   }
 
