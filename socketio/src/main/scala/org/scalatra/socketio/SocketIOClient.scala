@@ -93,6 +93,7 @@ trait SocketIOSession {
   }
 
   def messageReceived(message: String): Unit = {
+    println("RECV: " + message)
     val decoded = decode(message)
     if (decoded.isEmpty) println("Bad message received from client [%s]." format id)
     decoded map { SocketIOData.parse _ } foreach {

@@ -341,7 +341,8 @@ if (typeof window != 'undefined'){
 	XHR.prototype._request = function(url, method, multipart){
 		var req = request(this.base._isXDomain());
 		if (multipart) req.multipart = true;
-		req.open(method || 'GET', this._prepareUrl() + (url ? '/' + url : ''));
+		var u = this._prepareUrl()
+		req.open(method || 'GET', u + (url ? (url + (/\/$/.test(u) ? "" : "/")) : ''));
 		if (method == 'POST' && 'setRequestHeader' in req){
 			req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=utf-8');
 		}

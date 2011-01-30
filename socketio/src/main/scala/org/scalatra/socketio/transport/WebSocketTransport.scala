@@ -9,6 +9,7 @@ import java.lang.String
 import org.eclipse.jetty.websocket.WebSocket.Outbound
 import SocketIO._
 import java.io.UnsupportedEncodingException
+import java.util.Locale
 
 object WebSocketTransport {
 
@@ -60,7 +61,7 @@ object WebSocketTransport {
     def isHixie() = Option(request.getHeader("Sec-WebSocket-Key1")).isDefined
 
     def isWebSocketUpgrade() = {
-      request.getMethod == "GET" && request.getHeader("Upgrade") == "WebSocket"
+      request.getMethod == "GET" && request.getHeader("Upgrade").toUpperCase(Locale.ENGLISH) == "WEBSOCKET"
     }
   }
 
@@ -78,7 +79,6 @@ class WebSocketTransport(bufferSize: Int, maxIdleTime: Int) extends Transport {
   wsFactory.setBufferSize(bufferSize)
 
   def handle(config: ClientConfig) = {
-    println("in websocket transport handle with\n%s" format config)
     request = config.transport.request
     response = config.transport.response
     val connection = if (config.transport.request.isWebSocketUpgrade && config.session.sessionId.isDefined) {
