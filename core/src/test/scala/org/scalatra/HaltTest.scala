@@ -17,7 +17,7 @@ class HaltTestServlet extends ScalatraServlet {
   }
 
   get("/halt-no-status") {
-    status(HttpServletResponse.SC_ACCEPTED)
+    status = HttpServletResponse.SC_ACCEPTED
     halt()
     "this content must not be returned"
   }

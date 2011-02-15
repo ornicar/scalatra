@@ -155,7 +155,7 @@ trait ScalatraKernel extends Handler with Initializable
   def notFound(fun: => Any) = doNotFound = { () => fun }
 
   protected def handleError(e: Throwable): Any = {
-    status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+    status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
     _caughtThrowable.withValue(e) { errorHandler() }
   }
 
@@ -209,7 +209,23 @@ trait ScalatraKernel extends Handler with Initializable
     case s: HttpSession => Some(s)
     case null => None
   }
-  def status(code: Int) = (_response value) setStatus code
+
+  @deprecated("Use status = code instead")
+  def status(code: Int): Unit = status = code
+
+  /**
+   * Sets the HTTP status of the response.
+   *
+   * @param code the status code
+   * @see javax.http.servlet.HttpServletResponse
+   */
+  def status_=(code: Int): Unit = (_response value) setStatus code
+
+  /*
+   * For the setter notation to work, we need a getter (SLS 6.15).
+   * This will be made public and supported as part of SSGI.
+   */
+  def status: Int = throw new UnsupportedOperationException
 
   def halt(code: Int, msg: String) = throw new HaltException(Some(code), Some(msg))
   def halt(code: Int) = throw new HaltException(Some(code), None)
