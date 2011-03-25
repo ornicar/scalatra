@@ -5,6 +5,7 @@ package org.scalatra
 
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
+import java.net.URLEncoder
 
 class RouteTestServlet extends ScalatraServlet {
   get(params.getOrElse("booleanTest", "false") == "true") {
@@ -83,6 +84,10 @@ class RouteTestServlet extends ScalatraServlet {
     "shouldn't return"
   }
 
+  get("/url_encoded/(.*)") {
+    params('url_encoded).urlDecode
+  }
+
   notFound {
     "not found"
   }
@@ -94,6 +99,12 @@ class RouteTest extends ScalatraFunSuite with ShouldMatchers {
   test("routes can be a boolean expression") {
     get("/whatever", "booleanTest" -> "true") {
       body should equal ("matched boolean route")
+    }
+  }
+
+  test("supports url encoded params") {
+    get("/url_encoded/twitter%3A%2F%2Fcasualjim") {
+      body should equal ("twitter://casualjim")
     }
   }
 
@@ -159,7 +170,7 @@ class RouteTest extends ScalatraFunSuite with ShouldMatchers {
   }
 
   test("literally matches + in paths") {
-    get("/te+st") {
+    get("/" + URLEncoder.encode("te+st", "UTF-8")) {
       body should equal ("te+st")
     }
   }

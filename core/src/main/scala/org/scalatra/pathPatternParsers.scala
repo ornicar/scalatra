@@ -5,15 +5,18 @@ import scala.util.matching.Regex
 import scala.util.parsing.combinator.RegexParsers
 import java.util.regex.Pattern.{quote => escape}
 import ScalatraKernel.MultiParams
-import util.MultiMap
+import util.{RicherString, MultiMap}
 
 /**
  * A path pattern optionally matches a request path and extracts path
  * parameters.
  */
 case class PathPattern(regex: Regex, captureGroupNames: List[String] = Nil) {
+  protected implicit def string2RicherString(s: String) = new RicherString(s)
+  
   def apply(path: String): Option[MultiParams] = {
-    regex.findFirstMatchIn(path)
+    println(path.urlEncode)
+    regex.findFirstMatchIn(path.urlEncode)
       .map { captureGroupNames zip _.subgroups }
       .map { pairs =>
       val multiParams = new HashMap[String, ListBuffer[String]]
@@ -74,9 +77,10 @@ object SinatraPathPatternParser extends RegexPathPatternParser {
   private def namedGroup = ":" ~> """\w+""".r ^^
     { groupName => PartialPathPattern("([^/?#]+)", List(groupName)) }
 
-  private def literal = metaChar | normalChar
+  private def literal = normalChar
+//  private def literal = metaChar | normalChar
 
-  private def metaChar = """[\.\+\(\)\$]""".r ^^
+  private def metaChar = """([\.\+\(\)\$])""".r ^^
     { c => PartialPathPattern("\\" + c) }
 
   private def normalChar = ".".r ^^ { c => PartialPathPattern(c) }

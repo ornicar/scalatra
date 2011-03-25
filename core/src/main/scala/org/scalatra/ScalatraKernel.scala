@@ -7,12 +7,11 @@ import scala.util.matching.Regex
 import scala.collection.JavaConversions._
 import scala.collection.mutable.{ConcurrentMap, HashMap, ListBuffer}
 import scala.xml.NodeSeq
+import util._
 import util.io.copy
 import java.io.{File, FileInputStream}
 import java.util.concurrent.ConcurrentHashMap
 import scala.annotation.tailrec
-import util.{MultiMap, MapWithIndifferentAccess, MultiMapHeadView, using}
-
 object ScalatraKernel
 {
   type MultiParams = MultiMap
@@ -57,8 +56,13 @@ trait ScalatraKernel extends Handler with Initializable
   protected implicit def sessionWrapper(s: HttpSession) = new RichSession(s)
   protected implicit def servletContextWrapper(sc: ServletContext) = new RichServletContext(sc)
 
+  protected implicit def map2multimap(map: Map[String, Seq[String]]) = new MultiMap(map)
+
   protected[scalatra] class Route(val routeMatchers: Iterable[RouteMatcher], val action: Action) {
-    def apply(realPath: String): Option[Any] = RouteMatcher.matchRoute(routeMatchers) flatMap { invokeAction(_) }
+    def apply(realPath: String): Option[Any] = {
+      println("matching on: [%s]", realPath)
+      RouteMatcher.matchRoute(routeMatchers) flatMap { invokeAction(_) }
+    }
 
     private def invokeAction(routeParams: MultiParams) =
       _multiParams.withValue(multiParams ++ routeParams) {
@@ -73,14 +77,12 @@ trait ScalatraKernel extends Handler with Initializable
     override def toString = routeMatchers.toString()
   }
 
-  protected implicit def map2multimap(map: Map[String, Seq[String]]) = new MultiMap(map)
   /**
    * Pluggable way to convert Strings into RouteMatchers.  By default, we
    * interpret them the same way Sinatra does.
    */
   protected implicit def string2RouteMatcher(path: String): RouteMatcher =
     SinatraPathPatternParser(path)
-
   /**
    * Path pattern is decoupled from requests.  This adapts the PathPattern to
    * a RouteMatcher by supplying the request path.
@@ -105,6 +107,8 @@ trait ScalatraKernel extends Handler with Initializable
 
   protected implicit def booleanBlock2RouteMatcher(matcher: => Boolean): RouteMatcher =
     () => { if (matcher) Some(MultiMap()) else None }
+
+  protected implicit def string2RicherString(orig: String) = new RicherString(orig)
 
   def handle(request: HttpServletRequest, response: HttpServletResponse) {
     // As default, the servlet tries to decode params with ISO_8859-1.
