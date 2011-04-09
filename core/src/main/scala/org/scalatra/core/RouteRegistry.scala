@@ -5,9 +5,9 @@ import org.scalatra.ssgi.core.HttpMethod
 import java.util.concurrent.{ConcurrentSkipListSet}
 import collection.JavaConverters._
 import annotation.tailrec
-import collection.immutable.HashSet
 import org.scalatra.util.MultiMap
 import util.matching.Regex
+import collection.mutable
 
 trait ScalatraAction {
   val action: () => Any
@@ -82,8 +82,8 @@ object ScalatraRoute {
 
 class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraRouteImplicits { // deliberately not a case class because this one is mutable
 
-  private var _actions = new HashSet[ScalatraAction]
-  private var _matchCache = Map.empty[String, MultiMap]
+  private val _actions = new mutable.HashSet[ScalatraAction] with mutable.SynchronizedSet[ScalatraAction] {}
+//  private var _matchCache = Map.empty[String, MultiMap]
   def actions = _actions
 
   def isDefinedAt(matchers: Iterable[RouteMatcher]) = matchers.toList == routeMatchers.toList
@@ -102,17 +102,17 @@ class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraR
   }
 
   private def matchRoute(path: String) = {
-    _matchCache.get(path) orElse {
+//    _matchCache.get(path) orElse {
       (Option(MultiMap()) /: routeMatchers) { (acc, rm) =>
         acc flatMap { x =>
           rm(path) map { y =>
             val m = MultiMap(x ++ y)
-            _matchCache += path -> m
+//            _matchCache += path -> m
             m
           }
         }
       }
-    }
+//    }
   }
 
   def +=(action: ScalatraAction) = {
@@ -121,10 +121,12 @@ class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraR
   }
 
   def -=(method: HttpMethod) = {
-    _actions = actions filterNot {
+    val act = actions filterNot {
       case m: Action => m.method == method
       case _ => false
     }
+    _actions.clear()
+    _actions ++= act
   }
 
   override def equals(other: Any) = other match {
@@ -137,10 +139,13 @@ class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraR
   override def toString =
     "ScalatraRoute(matchers=[%s], actionCount=[%s], actions=[%s])".format(
       routeMatchers.mkString(", "), actions.size, actions.mkString(", "))
+
+
 }
+
 class RouteRegistry {
 
-  private[scalatra] var routes = new HashSet[ScalatraRoute]
+  private[scalatra] val routes = new mutable.HashSet[ScalatraRoute] with mutable.SynchronizedSet[ScalatraRoute] {}
 
   def +=(kv: (Iterable[RouteMatcher], ScalatraAction)) = {
     val (routeMatchers, action) = kv
