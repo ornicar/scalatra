@@ -212,7 +212,7 @@ class RouteTest extends ScalatraFunSuite with ShouldMatchers {
 
   test("matchers should not execute if one before it fails") {
     get("/fail") {
-      status
+      status should equal (405)
     }
   }
 }

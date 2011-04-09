@@ -13,8 +13,6 @@ class ParamsTestServlet extends ScalatraServlet {
   import ParamsTestServlet._
 
   get("/multiParams/:key") {
-    println(multiParams.getClass.getName)
-    println(multiParams)
     multiParams(params("key")).mkString("[",",","]")
   }
 

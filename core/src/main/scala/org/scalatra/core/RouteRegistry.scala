@@ -18,8 +18,6 @@ trait ScalatraAction {
       Some(action())
     } catch {
       case e: ScalatraKernel#PassException => {
-
-        println("passing through the pass method.")
         None
       }
     }
