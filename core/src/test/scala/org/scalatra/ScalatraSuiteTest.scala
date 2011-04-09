@@ -1,3 +1,7 @@
+/*
+ * This one is a bit of an oddball.  It tests the Scalatra-independent test framework with Scalatra.  Find a proper
+ * package home.
+ */
 package org.scalatra
 
 import org.scalatest.matchers.ShouldMatchers

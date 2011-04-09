@@ -1,9 +1,9 @@
 package org.scalatra.auth
 
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-import util.DynamicVariable
+import scala.util.DynamicVariable
 import javax.servlet.{FilterConfig, ServletConfig}
-import org.scalatra.{CookieSupport, Initializable, Handler, ScalatraKernel}
+import org.scalatra._
 
 trait ScentryConfig {
   val login = "/login"
