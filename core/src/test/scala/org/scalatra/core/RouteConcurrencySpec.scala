@@ -18,6 +18,7 @@ class RouteConcurrencyServlet extends ScalatraServlet {
     x = future { post(false) { "/"} }
   } yield x()
 
+  println(postRoutes.size)
   for {
     route <- postRoutes.take(250)
     x = future { post(false) {}; post(false) {}} // add some more routes while we're removing

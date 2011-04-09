@@ -5,9 +5,9 @@ import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
 class RoutePrecedenceTestBaseServlet extends ScalatraServlet {
-  get("/override-route") {
-    "base"
-  }
+//  get("/override-route") {
+//    "base"
+//  }
 }
 
 class RoutePrecedenceTestChildServlet extends RoutePrecedenceTestBaseServlet {
@@ -15,22 +15,23 @@ class RoutePrecedenceTestChildServlet extends RoutePrecedenceTestBaseServlet {
     "child"
   }
 
-  get("/hide-route") {
-    "hidden by later route"
-  }
 
   get("/hide-route") {
     "visible"
   }
 
-  get("/pass") {
-    response.getWriter.write("3")
+  get("/hide-route") {
+    "hidden by earlier route"
   }
 
   get("/pass") {
     response.getWriter.write("1")
     pass()
     response.getWriter.write("2")
+  }
+
+  get("/pass") {
+    response.getWriter.write("3")
   }
 
   get("/pass-to-not-found") {
@@ -40,11 +41,11 @@ class RoutePrecedenceTestChildServlet extends RoutePrecedenceTestBaseServlet {
   }
 
   get("/do-not-pass") {
-    response.getWriter.write("2")
+    response.getWriter.write("1")
   }
 
   get("/do-not-pass") {
-    response.getWriter.write("1")
+    response.getWriter.write("2")
   }
 
   notFound {
@@ -67,7 +68,7 @@ class RoutePrecedenceTest extends ScalatraFunSuite with ShouldMatchers {
      * classes override base classes' routes, proves to be difficult in an internal Scala DSL.  Sorry, Sinatra users.
      */
     get("/hide-route") {
-      "visible"
+      body should equal ("visible")
     }
   }
 

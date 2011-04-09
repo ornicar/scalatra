@@ -44,7 +44,9 @@ object ScalatraKernel
   {
 
     def contentType = response.getContentType
-    def contentType_=(value: String): Unit = response.setContentType(value)
+    def contentType_=(value: String) {
+      response.setContentType(value)
+    }
 
     protected val defaultCharacterEncoding = "UTF-8"
     protected val _response   = new DynamicVariable[HttpServletResponse](null)
@@ -71,9 +73,10 @@ object ScalatraKernel
             var actionParams: MultiParams = MultiMap()
             val result = try {
               val actionRoutes = routes(Actions, requestPath)
+              println("actionRoutes: " + actionRoutes)
               val notFound = actionRoutes.isEmpty
               // TODO: Should before filters always run or only when an action matches?
-              routes(BeforeActions, requestPath) foreach { r =>
+              routes(BeforeActions, requestPath).reverse foreach { r =>
                 _multiParams.withValue(multiParams ++ r.routeParams) {
                   r.actions foreach { _(multiParams) }
                 }
@@ -84,10 +87,13 @@ object ScalatraKernel
                 (actionRoutes flatMap { r =>
                   _multiParams.withValue(realMultiParams ++ r.routeParams) {
                     val acts = r.actions.map(_.asInstanceOf[Action])
-                    acts.find(_.method == effectiveMethod).foldLeft(None.asInstanceOf[Option[Any]]) { (acc, rr) =>
+                    println("acts: " + acts)
+                    acts.filter(_.method == effectiveMethod).foldLeft(None.asInstanceOf[Option[Any]]) { (acc, rr) =>
                       if (acc.isEmpty) {
                         actionParams = r.routeParams // keeping these around so subsequent actions also have access to the goodies
-                        rr(multiParams)
+                        val res = rr(multiParams)
+                        println("res: " + res)
+                        res
                       } else acc
                     }
                   }
@@ -96,19 +102,20 @@ object ScalatraKernel
                   if(!alt.isEmpty){
                     methodNotAllowed(alt)
                   }
-                  None // <-- we should never get here
+                  None
                 } getOrElse doNotFound()
               }
             }
             catch {
               case e => {
+                println("there was an error:\n" + e.getStackTraceString)
                 _multiParams.withValue(multiParams ++ actionParams) { handleError(e) }
               }
             }
             finally {
               // TODO: should after filters always run or only when there was a match?
               // TODO: should after fitlers run when an error occurred?
-              routes(AfterActions, requestPath) foreach { r =>
+              routes(AfterActions, requestPath).reverse foreach { r =>
                 _multiParams.withValue(multiParams ++ actionParams ++ r.routeParams) {
                   r.actions foreach { _(multiParams) }
                 }

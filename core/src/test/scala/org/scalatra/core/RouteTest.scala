@@ -52,13 +52,14 @@ class RouteTestServlet extends ScalatraServlet {
     "test(bar)"
   }
 
+  get("/conditional", params.getOrElse("condition", "false") == "true") {
+    "true"
+  }  
+
   get("/conditional") {
     "false"
   }
 
-  get("/conditional", params.getOrElse("condition", "false") == "true") {
-    "true"
-  }
 
   get("""^\/fo(.*)/ba(.*)""".r) {
     multiParams.getOrElse("captures", Seq.empty) mkString (":")
@@ -211,7 +212,7 @@ class RouteTest extends ScalatraFunSuite with ShouldMatchers {
 
   test("matchers should not execute if one before it fails") {
     get("/fail") {
-      body should equal ("not found")
+      status
     }
   }
 }

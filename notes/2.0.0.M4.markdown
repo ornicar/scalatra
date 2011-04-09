@@ -6,3 +6,6 @@
 * New handler to redirect non-SSL requests to SSL.
 * New handler to store and retrieve the HTTP status code.
 * [GH-49](http://github.com/scalatra/scalatra/issues/49): Remove unmanaged dependency on socketio-java.
+* Before and After filters now support route matchers too
+* Routes now match top-down just like sinatra
+* When a route matches but the method is wrong we now return a 405 status

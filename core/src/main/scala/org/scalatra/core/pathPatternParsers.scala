@@ -13,7 +13,7 @@ import util.MultiMap
  * parameters.
  */
 case class PathPattern(regex: Regex, captureGroupNames: List[String] = Nil) {
-  def apply(path: String): Option[MultiParams] = {
+  def apply(path: String): Option[core.ScalatraKernel.MultiParams] = {
     regex.findFirstMatchIn(path)
       .map { captureGroupNames zip _.subgroups }
       .map { pairs =>

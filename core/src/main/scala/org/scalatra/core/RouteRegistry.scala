@@ -18,6 +18,8 @@ trait ScalatraAction {
       Some(action())
     } catch {
       case e: ScalatraKernel#PassException => {
+
+        println("passing through the pass method.")
         None
       }
     }
@@ -36,6 +38,45 @@ case object Actions extends LifeCycle
 case object AfterActions extends Filtering
 
 trait RouteMatcher extends (String => Option[MultiParams])
+class PathPatternRouteMatcher(val pathPattern: PathPattern) extends RouteMatcher {
+  def apply(path: String) = pathPattern(path)
+
+  override def equals(p1: Any) = {
+    p1 match {
+      case other: PathPatternRouteMatcher => {
+        // ridiculous regex doesn't implement a good equals apparently
+        other.pathPattern.regex.toString == pathPattern.regex.toString
+      }
+      case other: PathPattern => {
+        // ridiculous regex doesn't implement a good equals apparently
+        other.regex.toString == pathPattern.regex.toString
+      }
+      case _ => false
+    }
+  }
+
+  override def hashCode() = 41 * (41 + pathPattern.hashCode)
+
+  override def toString() = pathPattern.regex.toString()
+}
+class RegexPatternRouteMatcher(val regex: Regex) extends RouteMatcher with ScalatraRouteImplicits {
+  def apply(path: String) = regex.findFirstMatchIn(path) map {
+    _.subgroups match {
+      case Nil => Map.empty
+      case xs => Map("captures" -> xs)
+    }
+  }
+
+  override def equals(p1: Any) = p1 match {
+    case other: RegexPatternRouteMatcher => other.regex.toString == regex.toString
+    case other: Regex => other.toString == regex.toString
+    case _ => false
+  }
+
+  override def hashCode() = 41 * (41 + regex.hashCode)
+
+  override def toString() = regex.toString()
+}
 
 trait ScalatraRouteImplicits {
   implicit def map2multimap(map: Map[String, Seq[String]]) = new MultiMap(map)
@@ -52,22 +93,10 @@ trait ScalatraRouteImplicits {
    * a RouteMatcher by supplying the request path.
    */
   protected implicit def pathPatternParser2RouteMatcher(pattern: PathPattern): RouteMatcher =
-    new RouteMatcher {
-      def apply(path: String) = pattern(path)
+    new PathPatternRouteMatcher(pattern)
 
-      // By overriding toString, we can list the available routes in the
-      // default notFound handler.
-      override def toString() = pattern.regex.toString()
-    }
-
-  protected implicit def regex2RouteMatcher(regex: Regex): RouteMatcher = new RouteMatcher {
-    def apply(path: String) = regex.findFirstMatchIn(path) map { _.subgroups match {
-      case Nil => Map.empty
-      case xs => Map("captures" -> xs)
-    }}
-
-    override def toString() = regex.toString()
-  }
+  protected implicit def regex2RouteMatcher(regex: Regex): RouteMatcher =
+    new RegexPatternRouteMatcher(regex)
 
   protected implicit def booleanBlock2RouteMatcher(matcher: => Boolean): RouteMatcher =
     (path: String) => { if (matcher) Some(MultiMap()) else None }
@@ -83,22 +112,24 @@ object ScalatraRoute {
 
 class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraRouteImplicits { // deliberately not a case class because this one is mutable
 
-  private val _actions = new mutable.HashSet[ScalatraAction] with mutable.SynchronizedSet[ScalatraAction] {}
+  private val _actions = new mutable.LinkedHashSet[ScalatraAction] with mutable.SynchronizedSet[ScalatraAction]
 //  private var _matchCache = Map.empty[String, MultiMap]
   def actions = _actions
 
-  def isDefinedAt(matchers: Iterable[RouteMatcher]) = matchers.toList == routeMatchers.toList
+  def isDefinedAt(matchers: Iterable[RouteMatcher]) = {
+    matchers.size == routeMatchers.size && matchersEqual(matchers)
+  }
   def isDefinedAt(path: String) = matchRoute(path).isDefined
   
   def apply(lifeCycle: LifeCycle, path: String) = lifeCycle match {
     case BeforeActions => {
-      matchRoute(path) map { MatchedRoute(_, actions filter { _.isInstanceOf[BeforeFilter] } toList) }
+      matchRoute(path) map { MatchedRoute(_, (actions filter { _.isInstanceOf[BeforeFilter] } toList)) }
     }
     case Actions => {
-      matchRoute(path) map { MatchedRoute(_, actions filter { _.isInstanceOf[Action] } toList) }
+      matchRoute(path) map { MatchedRoute(_, (actions filter { _.isInstanceOf[Action] } toList)) }
     }
     case AfterActions => {
-      matchRoute(path) map { MatchedRoute(_, actions filter { _.isInstanceOf[AfterFilter] } toList) }
+      matchRoute(path) map { MatchedRoute(_, (actions filter { _.isInstanceOf[AfterFilter] } toList)) }
     }
   }
 
@@ -128,11 +159,20 @@ class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraR
     }
     _actions.clear()
     _actions ++= act
+
   }
 
   override def equals(other: Any) = other match {
-    case r: ScalatraRoute => r.routeMatchers == routeMatchers && r.actions == actions
+    case r: ScalatraRoute => {
+      matchersEqual(r.routeMatchers)
+    }
     case _ => false
+  }
+
+  private def matchersEqual(other: Iterable[RouteMatcher]) = {
+    val o = other.filter(rm => rm.isInstanceOf[PathPatternRouteMatcher] || rm.isInstanceOf[RegexPatternRouteMatcher])
+    val t = routeMatchers.filter(rm => rm.isInstanceOf[PathPatternRouteMatcher] || rm.isInstanceOf[RegexPatternRouteMatcher])
+    !o.isEmpty && !t.isEmpty && o.size == t.size && t.forall { rm => o.exists { _ == rm } }
   }
 
   override def hashCode() = 41 * ( 41 + routeMatchers.toList.hashCode ) + actions.hashCode
@@ -151,7 +191,17 @@ class RouteRegistry {
 
   def +=(kv: (Iterable[RouteMatcher], ScalatraAction)) = {
     val (routeMatchers, action) = kv
-    routes find { case (_, rm) => rm.isDefinedAt(routeMatchers) } map { case (_, rm) => rm += action } getOrElse {
+    routes find {
+      case (_, rm) => {
+        val defi = rm.isDefinedAt(routeMatchers)
+        defi
+      }
+    } map {
+      case (i, rm) => {
+        routes += i -> (rm += action)
+        rm
+      }
+    } getOrElse {
       val r = ScalatraRoute(routeMatchers, action)
       routes += counter.incrementAndGet -> r
       r
@@ -161,7 +211,7 @@ class RouteRegistry {
   def -=(route: ScalatraRoute)  { routes find { case (_, rm) => rm == route } foreach { routes -= _._1 } }
 
   def apply(lifeCycleStage: LifeCycle, path: String) = {
-    (routes.values filter { _.isDefinedAt(path) } flatMap { _.apply(lifeCycleStage, path) })
+    (routes.values filter { _.isDefinedAt(path) } flatMap { _.apply(lifeCycleStage, path) }).toList
   }
 
 }
