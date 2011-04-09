@@ -17,11 +17,11 @@ case class CookieOptions(
 case class Cookie(name: String, value: String)(implicit cookieOptions: CookieOptions = CookieOptions()) {
   def toServletCookie = {
     val sCookie = new ServletCookie(name, value)
-    if(cookieOptions.domain.isNonBlank) sCookie.setDomain(cookieOptions.domain)
-    if(cookieOptions.path.isNonBlank) sCookie.setPath(cookieOptions.path)
+    if(cookieOptions.domain.isNotBlank) sCookie.setDomain(cookieOptions.domain)
+    if(cookieOptions.path.isNotBlank) sCookie.setPath(cookieOptions.path)
     sCookie.setMaxAge(cookieOptions.maxAge)
     if(cookieOptions.secure) sCookie.setSecure(cookieOptions.secure)
-    if(cookieOptions.comment.isNonBlank) sCookie.setComment(cookieOptions.comment)
+    if(cookieOptions.comment.isNotBlank) sCookie.setComment(cookieOptions.comment)
     sCookie
   }
 
@@ -30,16 +30,16 @@ case class Cookie(name: String, value: String)(implicit cookieOptions: CookieOpt
     sb append name append "="
     sb append value
 
-    if(cookieOptions.domain.isNonBlank) sb.append("; Domain=").append(
+    if(cookieOptions.domain.isNotBlank) sb.append("; Domain=").append(
       (if (!cookieOptions.domain.startsWith(".")) "." + cookieOptions.domain else cookieOptions.domain).toLowerCase(Locale.ENGLISH)
     )
 
     val pth = cookieOptions.path
-    if(pth.isNonBlank) sb append "; Path=" append (if(!pth.startsWith("/")) {
+    if(pth.isNotBlank) sb append "; Path=" append (if(!pth.startsWith("/")) {
       "/" + pth
     } else { pth })
 
-    if(cookieOptions.comment.isNonBlank) sb append ("; Comment=") append cookieOptions.comment
+    if(cookieOptions.comment.isNotBlank) sb append ("; Comment=") append cookieOptions.comment
 
     if(cookieOptions.maxAge > -1) sb append "; Max-Age=" append cookieOptions.maxAge
 

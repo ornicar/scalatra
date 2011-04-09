@@ -210,6 +210,40 @@ class ScalatraProject(info: ProjectInfo)
     val description = "Specs 2 support for the Scalatra test framework"
   }, scalatraTest)
 
+  lazy val akka = project("akka", "scalatra-akka", new DefaultProject(_) with ScalatraSubproject with AkkaProject with TestWithScalatraTest {
+
+    val description = "Akka Actor support for scalatra"
+
+
+    override def ivyXML =
+      <dependencies>
+        <dependency org="se.scalablesolutions.akka" name="akka-http" rev="1.0">
+          <exclude module="jetty-continuation"/>
+          <exclude module="jetty-http"/>
+          <exclude module="jetty-io"/>
+          <exclude module="jetty-security"/>
+          <exclude module="jetty-server"/>
+          <exclude module="jetty-servlet"/>
+          <exclude module="jetty-util"/>
+          <exclude module="jetty-xml"/>
+        </dependency>
+      </dependencies>
+
+    val akkaHttp = akkaModule("http")
+
+    def jetty(mod: String, tgt: String) = jettyGroupId % "jetty-%s".format(mod)  % jettyVersion % tgt
+
+//    val jettyServer = jetty("server", "test")
+    val jettyWebapp =  jetty("webapp", "test")
+//    val jettyServlet = jetty("servlet", "provided")
+    val jettyWebsocket = jetty("websocket", "provided")
+//    val jettyXml = jetty("xml", "test")
+//    val jettyIO = jetty("io", "test")
+//    val jettyContinuation = jetty("continuation", "provided")
+//    val servletApi = (if (SERVLET_API == "2.5") "javax.servlet" else "org.mortbay.jetty") % "servlet-api" % SERVLET_API % "provided" withSources
+
+  }, core)
+
   lazy val archetype = project("archetype", "simple-scalatra-archetype", new ArchetypeProject(_))
   class ArchetypeProject(info: ProjectInfo) extends DefaultProject(info) with ScalatraSubproject
 
@@ -238,6 +272,7 @@ class ScalatraProject(info: ProjectInfo)
   }
   // Without this, scalatra-scalatest and scalatra-specs can't find scalatra-test
   val scalatraRepo = publishTo
+  val socketIORepo = "Sonatype Nexus Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
   override def deliverProjectDependencies = Nil
 

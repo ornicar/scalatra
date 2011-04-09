@@ -64,7 +64,7 @@ class Scentry[UserType <: AnyRef](
 
   def user : UserType = if (_user != null) _user else {
     val key = store.get
-    if (key.isNonBlank) {
+    if (key.isNotBlank) {
       runCallbacks() { _.beforeFetch(key) }
       val res = fromSession(key)
       if (res != null) runCallbacks() { _.afterFetch(res) }

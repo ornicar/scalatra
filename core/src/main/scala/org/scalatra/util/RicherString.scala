@@ -4,7 +4,7 @@ import java.nio.charset.Charset
 
 class RicherString(orig: String) {
   def isBlank = orig == null || orig.trim.isEmpty
-  def isNonBlank = !isBlank
+  def isNotBlank = !isBlank
 //  def urlDecode(charset: Charset =)
 }
 

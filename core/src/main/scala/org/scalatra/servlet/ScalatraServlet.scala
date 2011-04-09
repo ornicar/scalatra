@@ -21,7 +21,7 @@ abstract class ScalatraServlet
   // slash and include everything between the context route and the query string.
   def requestPath = if (request.getPathInfo != null) request.getPathInfo else request.getServletPath
 
-  protected var doNotFound: Action = () => {
+  protected var doNotFound: () => Any = () => {
     // TODO - We should return a 405 if the route matches a different method
     response.setStatus(404)
     response.getWriter println "Requesting %s but only have %s".format(request.getRequestURI, routes)
