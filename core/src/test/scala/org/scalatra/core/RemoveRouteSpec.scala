@@ -6,7 +6,9 @@ import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraSuite
 
 class RemoveRouteServlet extends ScalatraServlet {
-  val foo = get("/foo") { "foo" }
+  val foo = get("/foo") {
+    "foo"
+  }
 
   post("/remove") {
     removeRoute("GET", foo)

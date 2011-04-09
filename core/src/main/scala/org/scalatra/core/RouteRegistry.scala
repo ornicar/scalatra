@@ -83,7 +83,7 @@ object ScalatraRoute {
 class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraRouteImplicits { // deliberately not a case class because this one is mutable
 
   private val _actions = new mutable.HashSet[ScalatraAction] with mutable.SynchronizedSet[ScalatraAction] {}
-//  private var _matchCache = Map.empty[String, MultiMap]
+  private var _matchCache = Map.empty[String, MultiMap]
   def actions = _actions
 
   def isDefinedAt(matchers: Iterable[RouteMatcher]) = matchers.toList == routeMatchers.toList
@@ -102,17 +102,18 @@ class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraR
   }
 
   private def matchRoute(path: String) = {
-//    _matchCache.get(path) orElse {
+    _matchCache.get(path) orElse {
+      println("matching route: " + path)
       (Option(MultiMap()) /: routeMatchers) { (acc, rm) =>
         acc flatMap { x =>
           rm(path) map { y =>
             val m = MultiMap(x ++ y)
-//            _matchCache += path -> m
+            _matchCache += path -> m
             m
           }
         }
       }
-//    }
+    }
   }
 
   def +=(action: ScalatraAction) = {

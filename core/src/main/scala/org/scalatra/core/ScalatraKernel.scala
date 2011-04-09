@@ -88,6 +88,7 @@ object ScalatraKernel
             var actionParams: MultiParams = MultiMap()
             val result = try {
               val actionRoutes = routes(Actions, requestPath)
+              println("the action routes: " + actionRoutes)
               val notFound = actionRoutes.isEmpty
               // TODO: Should before filters always run or only when an action matches?
               routes(BeforeActions, requestPath) foreach { r =>
@@ -98,18 +99,22 @@ object ScalatraKernel
               if(notFound) {
                 doNotFound()
               } else {
-                actionRoutes flatMap { r =>
+                (actionRoutes flatMap { r =>
                   _multiParams.withValue(realMultiParams ++ r.routeParams) {
                     val acts = r.actions.map(_.asInstanceOf[Action])
-                    (acts find { _.method == effectiveMethod } orElse {
-                      methodNotAllowed(acts.filterNot(_.method == effectiveMethod).map(_.method))
-                      None // <-- we should never get here
-                    } flatMap { rr =>
+                    acts find { _.method == effectiveMethod } flatMap { rr =>
                       actionParams = r.routeParams // keeping these around so subsequent actions also have access to the goodies
                       rr(multiParams)
-                    })
+                    }
                   }
-                } head
+                } headOption) orElse {
+                  val alt = actionRoutes.flatMap(_.actions.map(_.asInstanceOf[Action])).filterNot(_.method == effectiveMethod).map(_.method).toList
+                  if(!alt.isEmpty){
+                    println("Couldn't match by method: %s but have %s".format(effectiveMethod, alt.mkString(", ")))
+                    methodNotAllowed(alt)
+                  }
+                  None // <-- we should never get here
+                } getOrElse doNotFound()
               }
             }
             catch {

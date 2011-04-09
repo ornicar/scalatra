@@ -13,22 +13,27 @@ class DefaultRouteTestServlet extends ScalatraServlet {
   import DefaultRouteTest._
 
   get(existingRoute) {
+    println(routes.routes.mkString("[", ", ", "]"))
     "get"
   }
 
   post(existingRoute) {
+    println(routes.routes.mkString("[", ", ", "]"))
     "post"
   }
 
   put(existingRoute) {
+    println(routes.routes.mkString("[", ", ", "]"))
     "put"
   }
 
   delete(existingRoute) {
+    println(routes.routes.mkString("[", ", ", "]"))
     "delete"
   }
 
   options(existingRoute) {
+    println(routes.routes.mkString("[", ", ", "]"))
     "options"
   }
 }
