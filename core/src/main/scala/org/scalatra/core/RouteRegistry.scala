@@ -2,12 +2,13 @@ package org.scalatra.core
 
 import ScalatraKernel.MultiParams
 import org.scalatra.ssgi.core.HttpMethod
-import java.util.concurrent.{ConcurrentSkipListSet}
 import collection.JavaConverters._
 import annotation.tailrec
 import org.scalatra.util.MultiMap
 import util.matching.Regex
 import collection.mutable
+import java.util.concurrent.{ConcurrentHashMap, ConcurrentSkipListSet}
+import actors.threadpool.AtomicInteger
 
 trait ScalatraAction {
   val action: () => Any
@@ -83,7 +84,7 @@ object ScalatraRoute {
 class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraRouteImplicits { // deliberately not a case class because this one is mutable
 
   private val _actions = new mutable.HashSet[ScalatraAction] with mutable.SynchronizedSet[ScalatraAction] {}
-  private var _matchCache = Map.empty[String, MultiMap]
+//  private var _matchCache = Map.empty[String, MultiMap]
   def actions = _actions
 
   def isDefinedAt(matchers: Iterable[RouteMatcher]) = matchers.toList == routeMatchers.toList
@@ -102,18 +103,17 @@ class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraR
   }
 
   private def matchRoute(path: String) = {
-    _matchCache.get(path) orElse {
-      println("matching route: " + path)
+//    _matchCache.get(path) orElse {
       (Option(MultiMap()) /: routeMatchers) { (acc, rm) =>
         acc flatMap { x =>
           rm(path) map { y =>
             val m = MultiMap(x ++ y)
-            _matchCache += path -> m
+//            _matchCache += path -> m
             m
           }
         }
       }
-    }
+//    }
   }
 
   def +=(action: ScalatraAction) = {
@@ -146,21 +146,22 @@ class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraR
 
 class RouteRegistry {
 
-  private[scalatra] val routes = new mutable.HashSet[ScalatraRoute] with mutable.SynchronizedSet[ScalatraRoute] {}
+  private val counter = new AtomicInteger(0)
+  private[scalatra] val routes = new ConcurrentHashMap[Int, ScalatraRoute].asScala
 
   def +=(kv: (Iterable[RouteMatcher], ScalatraAction)) = {
     val (routeMatchers, action) = kv
-    routes find { _.isDefinedAt(routeMatchers) } map { _ += action } getOrElse {
+    routes find { case (_, rm) => rm.isDefinedAt(routeMatchers) } map { case (_, rm) => rm += action } getOrElse {
       val r = ScalatraRoute(routeMatchers, action)
-      routes += r
+      routes += counter.incrementAndGet -> r
       r
     }
   }
 
-  def -=(route: ScalatraRoute) = routes -= route
+  def -=(route: ScalatraRoute)  { routes find { case (_, rm) => rm == route } foreach { routes -= _._1 } }
 
   def apply(lifeCycleStage: LifeCycle, path: String) = {
-    routes filter { _.isDefinedAt(path) } flatMap { _.apply(lifeCycleStage, path) } toStream
+    (routes.values filter { _.isDefinedAt(path) } flatMap { _.apply(lifeCycleStage, path) })
   }
 
 }

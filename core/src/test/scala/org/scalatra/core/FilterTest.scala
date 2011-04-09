@@ -116,7 +116,7 @@ class FilterTest extends ScalatraFunSuite with BeforeAndAfterEach with ShouldMat
 
   test("supports multiple before and after filters") {
     get("/multiple-filters/") {
-      body should equal ("one\ntwo\nthree\nfour\nfive\n")
+      body should equal ("two\none\nthree\nfour\nfive\n")
     }
   }
 

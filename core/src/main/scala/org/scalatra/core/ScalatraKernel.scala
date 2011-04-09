@@ -54,23 +54,6 @@ object ScalatraKernel
     protected implicit def sessionWrapper(s: HttpSession) = new RichSession(s)
     protected implicit def servletContextWrapper(sc: ServletContext) = new RichServletContext(sc)
 
-//    protected[scalatra] class Route(val routeMatchers: Iterable[RouteMatcher], val action: Action) {
-//      def apply(realPath: String): Option[Any] = RouteMatcher.matchRoute(routeMatchers) flatMap { invokeAction(_) }
-//
-//      private def invokeAction(routeParams: MultiParams) =
-//        _multiParams.withValue(multiParams ++ routeParams) {
-//          try {
-//            Some(action.apply())
-//          }
-//          catch {
-//            case e: PassException => None
-//          }
-//        }
-//
-//      override def toString = routeMatchers.toString()
-//    }
-
-
     def handle(request: HttpServletRequest, response: HttpServletResponse) {
       // As default, the servlet tries to decode params with ISO_8859-1.
       // It causes an EOFException if params are actually encoded with the other code (such as UTF-8)
@@ -88,7 +71,6 @@ object ScalatraKernel
             var actionParams: MultiParams = MultiMap()
             val result = try {
               val actionRoutes = routes(Actions, requestPath)
-              println("the action routes: " + actionRoutes)
               val notFound = actionRoutes.isEmpty
               // TODO: Should before filters always run or only when an action matches?
               routes(BeforeActions, requestPath) foreach { r =>
@@ -102,15 +84,16 @@ object ScalatraKernel
                 (actionRoutes flatMap { r =>
                   _multiParams.withValue(realMultiParams ++ r.routeParams) {
                     val acts = r.actions.map(_.asInstanceOf[Action])
-                    acts find { _.method == effectiveMethod } flatMap { rr =>
-                      actionParams = r.routeParams // keeping these around so subsequent actions also have access to the goodies
-                      rr(multiParams)
+                    acts.find(_.method == effectiveMethod).foldLeft(None.asInstanceOf[Option[Any]]) { (acc, rr) =>
+                      if (acc.isEmpty) {
+                        actionParams = r.routeParams // keeping these around so subsequent actions also have access to the goodies
+                        rr(multiParams)
+                      } else acc
                     }
                   }
                 } headOption) orElse {
                   val alt = actionRoutes.flatMap(_.actions.map(_.asInstanceOf[Action])).filterNot(_.method == effectiveMethod).map(_.method).toList
                   if(!alt.isEmpty){
-                    println("Couldn't match by method: %s but have %s".format(effectiveMethod, alt.mkString(", ")))
                     methodNotAllowed(alt)
                   }
                   None // <-- we should never get here

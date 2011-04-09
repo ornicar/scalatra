@@ -25,7 +25,7 @@ class RouteConcurrencyServlet extends ScalatraServlet {
   } (x(), y())
 
   get("/count/:method") {
-    routes.routes.flatMap(_.actions.filter {
+    routes.routes.values.flatMap(_.actions.filter {
       case a: Action => a.method == HttpMethod(params('method))
       case _ => false
     }).size
