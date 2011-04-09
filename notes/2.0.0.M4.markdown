@@ -9,3 +9,4 @@
 * Before and After filters now support route matchers too
 * Routes now match top-down just like sinatra
 * When a route matches but the method is wrong we now return a 405 status
+* Render pipeline, you can chain conversions together until you return unit then the pipeline stops

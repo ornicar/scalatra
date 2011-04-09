@@ -56,6 +56,33 @@ object ScalatraKernel
     protected implicit def sessionWrapper(s: HttpSession) = new RichSession(s)
     protected implicit def servletContextWrapper(sc: ServletContext) = new RichServletContext(sc)
 
+    private def runAction(actionRoutes: List[MatchedRoute[ScalatraAction]], realMultiParams: Map[String, scala.Seq[String]]): (MultiParams, Any) = {
+      var actionParams = new MultiParams()
+      val ares = (actionRoutes flatMap {
+        r =>
+          _multiParams.withValue(realMultiParams ++ r.routeParams) {
+            val acts = r.actions.map(_.asInstanceOf[Action])
+            acts.filter(_.method == effectiveMethod).foldLeft(None.asInstanceOf[Option[Any]]) {
+              (acc, rr) =>
+                if (acc.isEmpty) {
+                  actionParams = r.routeParams // keeping these around so subsequent actions also have access to the goodies
+                  val res = rr(multiParams)
+                  res
+                } else acc
+            }
+          }
+      } headOption) orElse {
+        val alt = actionRoutes.flatMap(_.actions.map(_.asInstanceOf[Action]))
+            .filterNot(_.method == effectiveMethod)
+            .map(_.method).toList
+        if (!alt.isEmpty) {
+          methodNotAllowed(alt)
+        }
+        None
+      } getOrElse doNotFound()
+      (actionParams, ares)
+    }
+
     def handle(request: HttpServletRequest, response: HttpServletResponse) {
       // As default, the servlet tries to decode params with ISO_8859-1.
       // It causes an EOFException if params are actually encoded with the other code (such as UTF-8)
@@ -75,32 +102,13 @@ object ScalatraKernel
               val actionRoutes = routes(Actions, requestPath)
               val notFound = actionRoutes.isEmpty
               // TODO: Should before filters always run or only when an action matches?
-              routes(BeforeActions, requestPath).reverse foreach { r =>
-                _multiParams.withValue(multiParams ++ r.routeParams) {
-                  r.actions foreach { _(multiParams) }
-                }
-              }
+              runFilters(BeforeActions, multiParams)
               if(notFound) {
                 doNotFound()
               } else {
-                (actionRoutes flatMap { r =>
-                  _multiParams.withValue(realMultiParams ++ r.routeParams) {
-                    val acts = r.actions.map(_.asInstanceOf[Action])
-                    acts.filter(_.method == effectiveMethod).foldLeft(None.asInstanceOf[Option[Any]]) { (acc, rr) =>
-                      if (acc.isEmpty) {
-                        actionParams = r.routeParams // keeping these around so subsequent actions also have access to the goodies
-                        val res = rr(multiParams)
-                        res
-                      } else acc
-                    }
-                  }
-                } headOption) orElse {
-                  val alt = actionRoutes.flatMap(_.actions.map(_.asInstanceOf[Action])).filterNot(_.method == effectiveMethod).map(_.method).toList
-                  if(!alt.isEmpty){
-                    methodNotAllowed(alt)
-                  }
-                  None
-                } getOrElse doNotFound()
+                val (ap, res) = runAction(actionRoutes, realMultiParams)
+                actionParams = ap
+                res
               }
             }
             catch {
@@ -111,11 +119,7 @@ object ScalatraKernel
             finally {
               // TODO: should after filters always run or only when there was a match?
               // TODO: should after fitlers run when an error occurred?
-              routes(AfterActions, requestPath).reverse foreach { r =>
-                _multiParams.withValue(multiParams ++ actionParams ++ r.routeParams) {
-                  r.actions foreach { _(multiParams) }
-                }
-              }
+              runFilters(AfterActions, multiParams ++ actionParams)
             }
             renderResponse(result)
           }
@@ -123,6 +127,13 @@ object ScalatraKernel
       }
     }
 
+    private def runFilters(lifeCycle: Filtering, pars: => MultiParams) {
+      routes(lifeCycle, requestPath).reverse foreach { r =>
+        _multiParams.withValue(pars ++ r.routeParams) {
+          r.actions foreach { _(multiParams) }
+        }
+      }
+    }
 
     protected def effectiveMethod: HttpMethod =
       HttpMethod(request.getMethod) match {
