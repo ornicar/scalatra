@@ -80,7 +80,7 @@ class RouteTestServlet extends ScalatraServlet {
     "I match any post!"
   }
 
-  get("/fail", false, () => { throw new RuntimeException("shouldn't execute"); None }) {
+  get("/fail", false, (path: String) => { throw new RuntimeException("shouldn't execute"); None }) {
     "shouldn't return"
   }
 

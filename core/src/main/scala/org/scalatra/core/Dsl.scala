@@ -2,52 +2,13 @@ package org.scalatra
 package core
 
 import ssgi.core._
-import core.ScalatraKernel.MultiParams
-import scala.util.matching.Regex
 import util.MultiMap
 
-trait Dsl {
-
-  protected implicit def map2multimap(map: Map[String, Seq[String]]) = new MultiMap(map)
-
-  protected def requestPath: String
-
-  /**
-   * Pluggable way to convert Strings into RouteMatchers.  By default, we
-   * interpret them the same way Sinatra does.
-   */
-  protected implicit def string2RouteMatcher(path: String): RouteMatcher =
-    SinatraPathPatternParser(path)
-
-  /**
-   * Path pattern is decoupled from requests.  This adapts the PathPattern to
-   * a RouteMatcher by supplying the request path.
-   */
-  protected implicit def pathPatternParser2RouteMatcher(pattern: PathPattern): RouteMatcher =
-    new RouteMatcher {
-      def apply() = pattern(requestPath)
-
-      // By overriding toString, we can list the available routes in the
-      // default notFound handler.
-      override def toString = pattern.regex.toString
-    }
-
-  protected implicit def regex2RouteMatcher(regex: Regex): RouteMatcher = new RouteMatcher {
-    def apply() = regex.findFirstMatchIn(requestPath) map { _.subgroups match {
-      case Nil => Map.empty
-      case xs => Map("captures" -> xs)
-    }}
-
-    override def toString = regex.toString
-  }
-
-  protected implicit def booleanBlock2RouteMatcher(matcher: => Boolean): RouteMatcher =
-    () => { if (matcher) Some(MultiMap()) else None }
-
+trait Dsl extends ScalatraRouteImplicits {
 
   val routes = new RouteRegistry
 
-  private val matchAllRoutes = new RouteMatcher { def apply() = Some(new MultiParams) }
+  private val matchAllRoutes = new RouteMatcher { def apply(path: String) = Some(MultiMap()) }
 
   private def ensureMatcher(routeMatchers: Iterable[RouteMatcher]) =
     if (routeMatchers.isEmpty) List(matchAllRoutes).toIterable else routeMatchers
@@ -61,8 +22,6 @@ trait Dsl {
   def after(routeMatchers: RouteMatcher*)(fun: => Any) {
     routes += ensureMatcher(routeMatchers) -> AfterFilter(() => fun)
   }
-
-
 
   /**
    * The Scalatra DSL core methods take a list of [[org.scalatra.RouteMatcher]] and a block as

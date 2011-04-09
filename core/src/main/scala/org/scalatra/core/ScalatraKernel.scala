@@ -87,10 +87,10 @@ object ScalatraKernel
           _multiParams.withValue(Map() ++ realMultiParams) {
             var actionParams: MultiParams = MultiMap()
             val result = try {
-              val actionRoutes = routes(Actions)
+              val actionRoutes = routes(Actions, requestPath)
               val notFound = actionRoutes.isEmpty
               // TODO: Should before filters always run or only when an action matches?
-              routes(BeforeActions) foreach { r =>
+              routes(BeforeActions, requestPath) foreach { r =>
                 _multiParams.withValue(multiParams ++ r.routeParams) {
                   r.actions foreach { _(multiParams) }
                 }
@@ -120,7 +120,7 @@ object ScalatraKernel
             finally {
               // TODO: should after filters always run or only when there was a match?
               // TODO: should after fitlers run when an error occurred?
-              routes(AfterActions) foreach { r =>
+              routes(AfterActions, requestPath) foreach { r =>
                 _multiParams.withValue(multiParams ++ actionParams ++ r.routeParams) {
                   r.actions foreach { _(multiParams) }
                 }
@@ -209,7 +209,7 @@ object ScalatraKernel
     }
 
     protected[scalatra] val _multiParams = new DynamicVariable[MultiMap](new MultiMap)
-    protected def multiParams: MultiParams = (_multiParams.value).withDefaultValue(Seq.empty)
+    protected def multiParams: MultiParams = (MultiMap(_multiParams.value)).withDefaultValue(Seq.empty)
     /*
      * Assumes that there is never a null or empty value in multiParams.  The servlet container won't put them
      * in request.getParameters, and we shouldn't either.
