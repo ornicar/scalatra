@@ -2,6 +2,7 @@ package org.scalatra
 package auth
 
 import javax.servlet.http.HttpSession
+import ssgi.servlet.SweetCookies
 
 object ScentryAuthStore {
 
