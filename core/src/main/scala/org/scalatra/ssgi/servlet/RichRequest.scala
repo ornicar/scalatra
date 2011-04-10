@@ -1,11 +1,11 @@
-package org.scalatra
-package ssgi.servlet
+package org.scalatra.ssgi
+package servlet
 
 import scala.collection.{Map => CMap}
 import scala.io.Source
 import javax.servlet.http.HttpServletRequest
-import ssgi.core.HttpMethod
-import util.{MultiMap, MultiMapHeadView}
+import core.HttpMethod
+import org.scalatra.util.{MultiMap, MultiMapHeadView}
 
 case class RichRequest(r: HttpServletRequest) extends AttributesMap {
   @deprecated(message = "Use HttpServletRequest.getServerName() instead")

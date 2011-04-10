@@ -1,9 +1,10 @@
-package org.scalatra
-package ssgi.servlet
+package org.scalatra.ssgi
+package servlet
 
 import collection._
 import javax.servlet.http.{HttpServletResponse, Cookie => ServletCookie}
-import util.RicherString._
+import org.scalatra.util.RicherString._
+import core.{Cookie, CookieOptions}
 
 class SweetCookies(private val reqCookies: Map[String, String], private val response: HttpServletResponse) {
   private lazy val cookies = mutable.HashMap[String, String]() ++ reqCookies

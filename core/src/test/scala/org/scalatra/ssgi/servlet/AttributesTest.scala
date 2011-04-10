@@ -1,9 +1,10 @@
-package org.scalatra
-package ssgi.servlet
+package org.scalatra.ssgi
+package servlet
 
 import scala.collection.mutable.Map
 import org.scalatest.matchers.ShouldMatchers
-import test.scalatest.ScalatraFunSuite
+import org.scalatra.test.scalatest.ScalatraFunSuite
+import org.scalatra.servlet.ScalatraServlet
 
 trait AttributesTest {
   this: ScalatraFunSuite with ShouldMatchers =>

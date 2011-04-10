@@ -1,5 +1,5 @@
-package org.scalatra
-package ssgi.core
+package org.scalatra.ssgi
+package core
 
 import java.util.Locale
 

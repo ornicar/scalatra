@@ -1,5 +1,5 @@
-package org.scalatra
-package ssgi.servlet
+package org.scalatra.ssgi
+package servlet
 
 import javax.servlet.http.HttpSession
 

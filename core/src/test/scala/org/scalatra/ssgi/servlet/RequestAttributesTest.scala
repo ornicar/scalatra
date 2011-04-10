@@ -1,8 +1,8 @@
-package org.scalatra
-package ssgi.servlet
+package org.scalatra.ssgi
+package servlet
 
 import org.scalatest.matchers.ShouldMatchers
-import test.scalatest.ScalatraFunSuite
+import org.scalatra.test.scalatest.ScalatraFunSuite
 
 class RequestAttributesTest extends ScalatraFunSuite with ShouldMatchers with AttributesTest {
   addServlet(new AttributesServlet {

@@ -1,10 +1,10 @@
-package org.scalatra
-package ssgi.servlet
+package org.scalatra.ssgi
+package servlet
 
 import scala.collection.mutable.Map
 import scala.collection.JavaConversions._
 import java.util.Enumeration
-import util.MutableMapWithIndifferentAccess
+import org.scalatra.util.MutableMapWithIndifferentAccess
 
 /**
  * Adapts attributes from the Servlet API to a standard Scala mutable map.
