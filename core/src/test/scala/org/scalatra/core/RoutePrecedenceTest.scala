@@ -4,7 +4,7 @@ package core
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
-class RoutePrecedenceTestBaseServlet extends ScalatraServlet {
+class RoutePrecedenceTestBaseServlet extends servlet.ScalatraServlet {
 //  get("/override-route") {
 //    "base"
 //  }

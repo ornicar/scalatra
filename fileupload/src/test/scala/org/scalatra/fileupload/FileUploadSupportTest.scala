@@ -9,7 +9,7 @@ import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
 import test.scalatest.ScalatraFunSuite
 
-class FileUploadSupportTestServlet extends ScalatraServlet with FileUploadSupport {
+class FileUploadSupportTestServlet extends servlet.ScalatraServlet with FileUploadSupport {
   post("""/multipart.*""".r) {
     params.get("string") foreach { response.setHeader("string", _) }
     fileParams.get("file") foreach { fi => response.setHeader("file", new String(fi.get)) }

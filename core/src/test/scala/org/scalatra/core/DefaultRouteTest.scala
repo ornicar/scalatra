@@ -9,7 +9,7 @@ object DefaultRouteTest {
   val nonExistentRoute = "/no-such-route"
 }
 
-class DefaultRouteTestServlet extends ScalatraServlet {
+class DefaultRouteTestServlet extends servlet.ScalatraServlet {
   import DefaultRouteTest._
 
   get(existingRoute) {

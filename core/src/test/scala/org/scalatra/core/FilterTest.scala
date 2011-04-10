@@ -5,7 +5,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
-class FilterTestServlet extends ScalatraServlet {
+class FilterTestServlet extends servlet.ScalatraServlet {
   var beforeCount = 0
   var afterCount = 0
 
@@ -57,7 +57,7 @@ class FilterTestFilter extends ScalatraFilter {
   }
 }
 
-class MultipleFilterTestServlet extends ScalatraServlet {
+class MultipleFilterTestServlet extends servlet.ScalatraServlet {
   before {
     response.getWriter.print("one\n")
   }

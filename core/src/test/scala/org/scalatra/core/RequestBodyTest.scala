@@ -6,7 +6,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
-class RequestBodyTestServlet extends ScalatraServlet {
+class RequestBodyTestServlet extends servlet.ScalatraServlet {
   post("/request-body") {
     request.body
   }

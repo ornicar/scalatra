@@ -5,7 +5,7 @@ import org.scalatest.matchers.ShouldMatchers
 import javax.servlet.http.HttpServletResponse
 import test.scalatest.ScalatraFunSuite
 
-class HaltTestServlet extends ScalatraServlet {
+class HaltTestServlet extends servlet.ScalatraServlet {
   get("/halts-response") {
     response.setHeader("testHeader", "testHeader")
     halt(501, "Not implemented (for test)")

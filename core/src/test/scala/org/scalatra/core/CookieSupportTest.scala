@@ -4,7 +4,7 @@ package core
 import test.scalatest.ScalatraFunSuite
 import org.scalatest.matchers.MustMatchers
 
-class CookieSupportServlet extends ScalatraServlet with CookieSupport {
+class CookieSupportServlet extends servlet.ScalatraServlet with CookieSupport {
 
   get("/getcookie") {
     cookies.get("somecookie") match {
@@ -19,7 +19,7 @@ class CookieSupportServlet extends ScalatraServlet with CookieSupport {
   }
 
   post("/setexpiringcookie") {
-    cookies.update("thecookie", params("cookieval"))(CookieOptions(maxAge = params("maxAge").toInt))
+    cookies.update("thecookie", params("cookieval"))(ssgi.core.CookieOptions(maxAge = params("maxAge").toInt))
   }
 
   post("/maplikeset") {

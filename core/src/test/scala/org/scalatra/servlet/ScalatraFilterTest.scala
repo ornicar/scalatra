@@ -35,7 +35,7 @@ class ScalatraFilterTestFilter extends ScalatraFilter {
   }
 }
 
-class ScalatraFilterTestPathMappedServlet extends ScalatraServlet {
+class ScalatraFilterTestPathMappedServlet extends servlet.ScalatraServlet {
   get("/filtered") {
     "path-mapped"
   }
@@ -45,7 +45,7 @@ class ScalatraFilterTestPathMappedServlet extends ScalatraServlet {
   }
 }
 
-class ScalatraFilterTestExtensionMappedServlet extends ScalatraServlet {
+class ScalatraFilterTestExtensionMappedServlet extends servlet.ScalatraServlet {
   get("/filtered.do") {
     "extension-mapped"
   }
@@ -55,7 +55,7 @@ class ScalatraFilterTestExtensionMappedServlet extends ScalatraServlet {
   }
 }
 
-class ScalatraFilterTestDefaultServlet extends ScalatraServlet {
+class ScalatraFilterTestDefaultServlet extends servlet.ScalatraServlet {
   get("/filtered") {
     "default"
   }
@@ -65,7 +65,7 @@ class ScalatraFilterTestDefaultServlet extends ScalatraServlet {
   }
 }
 
-class ScalatraFilterTestExactMatchServlet extends ScalatraServlet {
+class ScalatraFilterTestExactMatchServlet extends servlet.ScalatraServlet {
   get("/exact-match/filtered") {
     "exact match"
   }

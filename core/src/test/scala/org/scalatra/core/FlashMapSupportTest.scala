@@ -4,7 +4,7 @@ package core
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
-class FlashMapSupportTestServlet extends ScalatraServlet with FlashMapSupport {
+class FlashMapSupportTestServlet extends servlet.ScalatraServlet with FlashMapSupport {
   post("/message") {
     flash("message") = "posted"
     flash.get("message") foreach { x => response.setHeader("message", x.toString) }

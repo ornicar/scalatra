@@ -8,7 +8,7 @@ import org.eclipse.jetty.testing.HttpTester
 import java.net.URLEncoder
 import test.scalatest.ScalatraFunSuite
 
-class ContentTypeTestServlet extends ScalatraServlet {
+class ContentTypeTestServlet extends servlet.ScalatraServlet {
   get("/json") {
     contentType = "application/json; charset=utf-8"
     """{msg: "test"}"""

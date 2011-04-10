@@ -7,7 +7,7 @@ package core
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
-class RouteTestServlet extends ScalatraServlet {
+class RouteTestServlet extends servlet.ScalatraServlet {
   get(params.getOrElse("booleanTest", "false") == "true") {
     "matched boolean route"
   }

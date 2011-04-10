@@ -7,7 +7,7 @@ import ssgi.core.HttpMethod
 import test.scalatest.ScalatraSuite
 import scala.concurrent.ops._
 
-class RouteConcurrencyServlet extends ScalatraServlet {
+class RouteConcurrencyServlet extends servlet.ScalatraServlet {
   for {
     i <- 0 until 500
     x = future { get(false) { "/"} }
@@ -21,7 +21,7 @@ class RouteConcurrencyServlet extends ScalatraServlet {
   for {
     route <- postRoutes.take(250)
     x = future { post(false) {}; post(false) {}} // add some more routes while we're removing
-    y = future { removeRoute("POST", route) }
+    y = future { removeRoute(ssgi.core.HttpMethod("POST"), route) }
   } (x(), y())
 
   get("/count/:method") {

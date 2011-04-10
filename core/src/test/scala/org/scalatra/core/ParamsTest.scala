@@ -9,7 +9,7 @@ object ParamsTestServlet {
   val NoSuchElement = "No Such Element"
 }
 
-class ParamsTestServlet extends ScalatraServlet {
+class ParamsTestServlet extends servlet.ScalatraServlet {
   import ParamsTestServlet._
 
   get("/multiParams/:key") {

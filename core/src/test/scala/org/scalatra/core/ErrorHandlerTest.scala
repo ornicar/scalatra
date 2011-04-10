@@ -4,7 +4,7 @@ package core
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
-class ErrorHandlerTestServlet extends ScalatraServlet {
+class ErrorHandlerTestServlet extends servlet.ScalatraServlet {
   get("/") {
     throw new RuntimeException
   }

@@ -4,7 +4,7 @@ package core
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
-class MethodOverrideTestServlet extends ScalatraServlet with MethodOverride {
+class MethodOverrideTestServlet extends servlet.ScalatraServlet with MethodOverride {
   put("/foo") { "PUT" }
   post("/foo") { "POST" }
   get("/foo") { "GET" }

@@ -8,7 +8,7 @@ import test.scalatest.ScalatraFunSuite
 trait AttributesTest {
   this: ScalatraFunSuite with ShouldMatchers =>
 
-  trait AttributesServlet extends ScalatraServlet {
+  trait AttributesServlet extends servlet.ScalatraServlet {
     def attributesMap: Map[String, AnyRef]
 
     get("/attributes-test") {

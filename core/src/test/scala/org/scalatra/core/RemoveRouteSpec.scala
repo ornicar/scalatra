@@ -5,13 +5,13 @@ import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraSuite
 
-class RemoveRouteServlet extends ScalatraServlet {
+class RemoveRouteServlet extends servlet.ScalatraServlet {
   val foo = get("/foo") {
     "foo"
   }
 
   post("/remove") {
-    removeRoute("GET", foo)
+    removeRoute(ssgi.core.HttpMethod("GET"), foo)
   }
 
   notFound {

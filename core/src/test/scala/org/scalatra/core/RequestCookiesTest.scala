@@ -7,7 +7,7 @@ import org.scalatest.matchers.ShouldMatchers
 import org.eclipse.jetty.testing.HttpTester
 
 class RequestCookiesTest extends ScalatraFunSuite with ShouldMatchers {
-  addServlet(new ScalatraServlet {
+  addServlet(new servlet.ScalatraServlet {
     get("/multi-cookies") {
       Seq("one", "two", "three") map { key =>
         response.setHeader(key, request.multiCookies(key).mkString(":"))

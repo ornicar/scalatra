@@ -4,7 +4,7 @@ package core
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
-class RailsLikeRouteTestServlet extends ScalatraServlet {
+class RailsLikeRouteTestServlet extends servlet.ScalatraServlet {
   implicit override def string2RouteMatcher(path: String) =
     RailsPathPatternParser(path)
 

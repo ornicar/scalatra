@@ -4,8 +4,8 @@ package core
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
-class DefaultNotFoundTestServlet extends ScalatraServlet
-class CustomNotFoundTestServlet extends ScalatraServlet {
+class DefaultNotFoundTestServlet extends servlet.ScalatraServlet
+class CustomNotFoundTestServlet extends servlet.ScalatraServlet {
   notFound {
     response.setStatus(404)
     "notFound block executed"

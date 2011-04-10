@@ -9,7 +9,7 @@ import test.scalatest.ScalatraFunSuite
 import java.io.File
 import util.io.withTempFile
 
-class ScalatraTestServlet extends ScalatraServlet {
+class ScalatraTestServlet extends servlet.ScalatraServlet {
   get("/") {
     "root"
   }

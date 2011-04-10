@@ -4,7 +4,7 @@ package core
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
-class SessionTestServlet extends ScalatraServlet {
+class SessionTestServlet extends servlet.ScalatraServlet {
   get("/session") {
     session.getOrElse("val", "None")
   }

@@ -213,9 +213,9 @@ class RouteRegistry {
   }
 
   def apply(lifeCycleStage: LifeCycle, path: String) = { // only calculate matched list once
-    matchCache.getOrElseUpdate(
-      (lifeCycleStage, path),
-      (routes.values filter { _.isDefinedAt(path) } flatMap { _.apply(lifeCycleStage, path) }).toList)
+    /*matchCache.getOrElseUpdate(
+      (lifeCycleStage, path),*/
+      (routes.values filter { _.isDefinedAt(path) } flatMap { _.apply(lifeCycleStage, path) }).toList 
   }
 
   override def toString = routes map { case (_, route) => route } mkString ("[",", ", "]")

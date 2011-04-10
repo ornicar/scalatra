@@ -3,7 +3,7 @@ package core
 
 import test.specs.ScalatraSpecification
 
-class CsrfTokenServlet extends ScalatraServlet with CsrfTokenSupport {
+class CsrfTokenServlet extends servlet.ScalatraServlet with CsrfTokenSupport {
   get("/renderForm") {
     <html>
       <body>
