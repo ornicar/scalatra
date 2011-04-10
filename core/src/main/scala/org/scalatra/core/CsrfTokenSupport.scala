@@ -27,7 +27,7 @@ object CsrfTokenSupport {
   val DefaultKey = "org.scalatra.CsrfTokenSupport.key"
 }
 
-trait CsrfTokenSupport { self: ScalatraKernel =>
+trait CsrfTokenSupport { self: ScalatraDsl with ScalatraRequestHandler =>
   protected def csrfKey = CsrfTokenSupport.DefaultKey
   protected def csrfToken = session(csrfKey).asInstanceOf[String]
 

@@ -5,10 +5,10 @@ import javax.servlet.http.{HttpSession, HttpServletRequest, Cookie}
 
 trait ScentryStrategy[UserType <: AnyRef] {
 
-  protected implicit def sessionWrapper(s: HttpSession) = new RichSession(s)
-  protected implicit def requestWrapper(s: HttpServletRequest) = new RichRequest(s)
+  protected implicit def sessionWrapper(s: HttpSession) = new ssgi.servlet.RichSession(s)
+  protected implicit def requestWrapper(s: HttpServletRequest) = new ssgi.servlet.RichRequest(s)
 
-  protected val app: ScalatraKernel
+  protected val app: core.ScalatraDsl with core.ScalatraRequestHandler
   def name: Symbol = 'NameMe
 
   def registerWith(registrar: Scentry[UserType]) {
@@ -17,7 +17,7 @@ trait ScentryStrategy[UserType <: AnyRef] {
   }
   
 
-  def createStrategy(app: ScalatraKernel): this.type = {
+  def createStrategy(app: core.ScalatraDsl with core.ScalatraRequestHandler): this.type = {
     throwOverrideException
   }
 

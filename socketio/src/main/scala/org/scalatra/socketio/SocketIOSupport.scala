@@ -69,7 +69,7 @@ object SocketIOSupport {
 
   trait SocketIOClient extends SocketIOInbound {
 
-    val clientId = GenerateId()
+    val clientId = core.GenerateId()
     protected var _out: Option[SocketIOOutbound] = None
     private var _broadcaster: (Int, String) => Unit = null
 
@@ -121,8 +121,8 @@ object SocketIOSupport {
  * This interface is likely to change before 2.0.0.  Please come to the
  * mailing list or IRC before betting your project on this.
  */
-trait SocketIOSupport extends Handler with Initializable {
-  self: ScalatraServlet =>
+trait SocketIOSupport extends core.Handler with core.Initializable {
+  self: servlet.ScalatraServlet =>
 
   import SocketIOSupport._
 

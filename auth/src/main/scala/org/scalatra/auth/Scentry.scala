@@ -9,7 +9,7 @@ import collection.immutable.List._
 
 object Scentry {
 
-  type StrategyFactory[UserType <: AnyRef] = ScalatraKernel => ScentryStrategy[UserType]
+  type StrategyFactory[UserType <: AnyRef] = core.ScalatraDsl with core.ScalatraRequestHandler => ScentryStrategy[UserType]
 
   private val _globalStrategies = new HashMap[Symbol, StrategyFactory[_ <: AnyRef]]()
 
@@ -23,14 +23,14 @@ object Scentry {
 }
 
 class Scentry[UserType <: AnyRef](
-        app: ScalatraKernel,
+        app: core.ScalatraDsl with core.ScalatraRequestHandler,
         serialize: PartialFunction[UserType, String],
         deserialize: PartialFunction[String, UserType] ) {
 
   import RicherString._
 
   type StrategyType = ScentryStrategy[UserType]
-  type StrategyFactory = ScalatraKernel => StrategyType
+  type StrategyFactory = core.ScalatraDsl with core.ScalatraRequestHandler => StrategyType
 
   import Scentry._
   private val _strategies = new HashMap[Symbol, StrategyFactory]()

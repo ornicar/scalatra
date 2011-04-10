@@ -12,7 +12,7 @@ class SweetCookies(private val reqCookies: Map[String, String], private val resp
 
   def apply(key: String) = cookies.get(key) getOrElse (throw new Exception("No cookie could be found for the specified key"))
 
-  def update(name: String, value: String)(implicit cookieOptions: CookieOptions=CookieOptions()) = {
+  def update(name: String, value: String)(implicit cookieOptions: ssgi.core.CookieOptions=ssgi.core.CookieOptions()) = {
     val sCookie = new ServletCookie(name, value)
     if(cookieOptions.domain.isNotBlank) sCookie.setDomain(cookieOptions.domain)
     if(cookieOptions.path.isNotBlank) sCookie.setPath(cookieOptions.path)
@@ -25,16 +25,16 @@ class SweetCookies(private val reqCookies: Map[String, String], private val resp
     sCookie
   }
 
-  def set(name: String, value: String)(implicit cookieOptions: CookieOptions=CookieOptions()) = {
+  def set(name: String, value: String)(implicit cookieOptions: ssgi.core.CookieOptions=ssgi.core.CookieOptions()) = {
     this.update(name, value)(cookieOptions)
   }
 
   def delete(name: String) {
     cookies -= name
-    response.addHeader("Set-Cookie", Cookie(name, "")(CookieOptions(maxAge = 0)).toCookieString)
+    response.addHeader("Set-Cookie", ssgi.core.Cookie(name, "")(ssgi.core.CookieOptions(maxAge = 0)).toCookieString)
   }
 
-  def +=(keyValuePair: (String, String))(implicit cookieOptions: CookieOptions = CookieOptions()) = {
+  def +=(keyValuePair: (String, String))(implicit cookieOptions: ssgi.core.CookieOptions = ssgi.core.CookieOptions()) = {
     this.update(keyValuePair._1, keyValuePair._2)(cookieOptions)
   }
 

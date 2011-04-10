@@ -3,7 +3,7 @@ package examples
 import org.scalatra._
 
 // This Scalatra application is a simple servlet.
-class ScalatraExample extends ScalatraServlet {
+class ScalatraExample extends servlet.ScalatraServlet {
 
   // A Scalatra application is made up of routes.  A route is an HTTP
   // method (e.g., GET, POST), a path pattern, and an action block to

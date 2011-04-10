@@ -5,6 +5,7 @@ import java.util.Locale
 
 sealed trait HttpMethod {
   val isSafe: Boolean
+  lazy val isUnsafe = !isSafe
 }
 case object Options extends HttpMethod {
   val isSafe = true

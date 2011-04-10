@@ -6,8 +6,8 @@ import scala.util.DynamicVariable
 import ssgi.servlet.SweetCookies
 import ssgi.core.{ CookieOptions => SsgiCookieOptions }
 
-trait CookieSupport extends Handler {
-  self: ScalatraKernel =>
+trait CookieSupport extends core.Handler {
+  self: core.ScalatraDsl with core.ScalatraRequestHandler =>
 
   implicit def cookieOptions: SsgiCookieOptions = _cookieOptions.value
 
@@ -22,5 +22,5 @@ trait CookieSupport extends Handler {
   }
 
   private val _cookies = new DynamicVariable[SweetCookies](null)
-  private val _cookieOptions = new DynamicVariable[CookieOptions](CookieOptions())
+  private val _cookieOptions = new DynamicVariable[ssgi.core.CookieOptions](ssgi.core.CookieOptions())
 }

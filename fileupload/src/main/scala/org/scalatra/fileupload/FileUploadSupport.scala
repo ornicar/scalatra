@@ -19,7 +19,7 @@ import java.lang.String
    *
    * @note Once any handler with FileUploadSupport has accessed the request, the fileParams returned by FileUploadSupport will remain fixed for
    * the lifetime of the request. */
-trait FileUploadSupport extends ScalatraKernel {
+trait FileUploadSupport extends core.ScalatraRequestHandler { self: core.ScalatraDsl =>
   import FileUploadSupport._
 
   override def handle(req: HttpServletRequest, resp: HttpServletResponse) {

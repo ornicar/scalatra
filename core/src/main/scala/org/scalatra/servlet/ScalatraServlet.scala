@@ -3,14 +3,12 @@ package servlet
 
 import javax.servlet._
 import javax.servlet.http._
-import org.scalatra.Initializable
 
 abstract class ScalatraServlet
   extends HttpServlet 
-  with ScalatraKernel 
-  with Initializable
+  with core.ScalatraKernel
+  with core.Initializable
 {
-  import ScalatraKernel._
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) = handle(request, response)
 
@@ -22,7 +20,6 @@ abstract class ScalatraServlet
   def requestPath = if (request.getPathInfo != null) request.getPathInfo else request.getServletPath
 
   protected var doNotFound: () => Any = () => {
-    // TODO - We should return a 405 if the route matches a different method
     response.setStatus(404)
     response.getWriter println "Requesting %s but only have %s".format(request.getRequestURI, routes)
   }

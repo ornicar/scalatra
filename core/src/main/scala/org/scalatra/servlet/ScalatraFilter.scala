@@ -4,10 +4,9 @@ package servlet
 import scala.util.DynamicVariable
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import javax.servlet._
-import org.scalatra.Initializable
 
-trait ScalatraFilter extends Filter with ScalatraKernel with Initializable {
-  import ScalatraKernel._
+trait ScalatraFilter extends Filter with core.ScalatraKernel with core.Initializable {
+  import core.ScalatraKernel._
 
   private val _filterChain = new DynamicVariable[FilterChain](null)
   protected def filterChain = _filterChain.value

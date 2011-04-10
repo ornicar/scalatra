@@ -141,7 +141,7 @@ class ScalatraProject(info: ProjectInfo)
     val description = "Supplies optional SocketIO support for scalatra"
   }
 
-  lazy val example = project("example", "scalatra-example", new ExampleProject(_), core, fileupload, scalate, auth, socketio)
+  lazy val example = project("example", "scalatra-example", new ExampleProject(_), core, fileupload, scalate, auth, socketio, akka)
   class ExampleProject(info: ProjectInfo) extends DefaultWebProject(info) with ScalatraSubproject with UnpublishedProject {
     val jetty7 = jettyGroupId % "jetty-webapp" % jettyVersion % "test"
     val jetty7websocket = jettyGroupId % "jetty-websocket" % jettyVersion % "compile"
@@ -213,15 +213,15 @@ class ScalatraProject(info: ProjectInfo)
   lazy val akka = project("akka", "scalatra-akka", new DefaultProject(_) with ScalatraSubproject with AkkaProject with TestWithScalatraTest {
 
     val description = "Akka Actor support for scalatra"
-
+    def jetty(mod: String, tgt: String) = jettyGroupId % "jetty-%s".format(mod)  % jettyVersion % tgt
 
     override def ivyXML =
       <dependencies>
         <dependency org="se.scalablesolutions.akka" name="akka-http" rev="1.0">
           <exclude module="jetty-continuation"/>
           <exclude module="jetty-http"/>
-          <exclude module="jetty-io"/>
           <exclude module="jetty-security"/>
+          <exclude module="jetty-io"/>
           <exclude module="jetty-server"/>
           <exclude module="jetty-servlet"/>
           <exclude module="jetty-util"/>
@@ -231,16 +231,8 @@ class ScalatraProject(info: ProjectInfo)
 
     val akkaHttp = akkaModule("http")
 
-    def jetty(mod: String, tgt: String) = jettyGroupId % "jetty-%s".format(mod)  % jettyVersion % tgt
-
-//    val jettyServer = jetty("server", "test")
     val jettyWebapp =  jetty("webapp", "test")
-//    val jettyServlet = jetty("servlet", "provided")
     val jettyWebsocket = jetty("websocket", "provided")
-//    val jettyXml = jetty("xml", "test")
-//    val jettyIO = jetty("io", "test")
-//    val jettyContinuation = jetty("continuation", "provided")
-//    val servletApi = (if (SERVLET_API == "2.5") "javax.servlet" else "org.mortbay.jetty") % "servlet-api" % SERVLET_API % "provided" withSources
 
   }, core)
 

@@ -12,8 +12,8 @@ trait ScentryConfig {
   val failureUrl = "/unauthenticated"
 }
 
-trait ScentrySupport[TypeForUser <: AnyRef] extends Handler with Initializable with CookieSupport {
-  self : ScalatraKernel =>
+trait ScentrySupport[TypeForUser <: AnyRef] extends core.Handler with core.Initializable with core.CookieSupport {
+  self : core.ScalatraDsl with core.ScalatraRequestHandler =>
 
   type UserType = TypeForUser
   type ScentryConfiguration <: ScentryConfig

@@ -1,6 +1,6 @@
 package org.scalatra
 
-class CookiesExample extends ScalatraServlet with CookieSupport {
+class CookiesExample extends servlet.ScalatraServlet with core.CookieSupport {
   get("/cookies-example") {
     val previous = cookies.get("counter") match {
       case Some(v) =>  v.toInt

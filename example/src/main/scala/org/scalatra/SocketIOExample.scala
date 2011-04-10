@@ -3,7 +3,7 @@ package org.scalatra
 import socketio.SocketIOSupport
 
 
-class SocketIOExample extends ScalatraServlet with SocketIOSupport {
+class SocketIOExample extends servlet.ScalatraServlet with SocketIOSupport {
 
   socketio { builder =>
     builder.onConnect { client =>

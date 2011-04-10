@@ -12,7 +12,7 @@ object ScentryAuthStore {
     def invalidate
   }
 
-  class HttpOnlyCookieAuthStore(app: => (ScalatraKernel with CookieSupport), secureOnly: Boolean = false)
+  class HttpOnlyCookieAuthStore(app: => (core.ScalatraRequestHandler with core.CookieSupport), secureOnly: Boolean = false)
       extends CookieAuthStore(app.cookies, secureOnly) {
 
     private val SET_COOKIE = "Set-Cookie".intern
@@ -22,7 +22,7 @@ object ScentryAuthStore {
       //TODO: Make use of servlet 3.0 cookie implementation
       app.response.addHeader(
         SET_COOKIE,
-        Cookie(Scentry.scentryAuthKey, value)(CookieOptions(secure = secureOnly, httpOnly = true)).toCookieString
+        ssgi.core.Cookie(Scentry.scentryAuthKey, value)(ssgi.core.CookieOptions(secure = secureOnly, httpOnly = true)).toCookieString
       )
     }
 
@@ -34,7 +34,7 @@ object ScentryAuthStore {
       cookies.get(Scentry.scentryAuthKey) getOrElse ""
     }
     def set(value: String) {
-      cookies.set(Scentry.scentryAuthKey, value)(CookieOptions(secure = secureOnly))
+      cookies.set(Scentry.scentryAuthKey, value)(ssgi.core.CookieOptions(secure = secureOnly))
     }
     def invalidate {
       cookies -= Scentry.scentryAuthKey

@@ -8,7 +8,7 @@ import org.fusesource.scalate.TemplateEngine
 import org.fusesource.scalate.servlet.{ServletRenderContext, ServletTemplateEngine}
 import java.lang.Throwable
 
-trait ScalateSupport extends ScalatraKernel {
+trait ScalateSupport extends core.ScalatraKernel {
   self: {
     def servletContext: ServletContext
   } =>

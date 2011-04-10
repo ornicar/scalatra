@@ -3,7 +3,7 @@ package org.scalatra
 import socketio.SocketIOSupport
 import com.glines.socketio.server.SocketIOFrame
 
-class ChatServlet extends ScalatraServlet with SocketIOSupport {
+class ChatServlet extends servlet.ScalatraServlet with SocketIOSupport {
 
 
   socketio { socket =>

@@ -16,7 +16,7 @@ trait ScalatraAction {
     try {
       Some(action())
     } catch {
-      case e: ScalatraKernel#PassException => {
+      case e: ScalatraRequestHandler#PassException => {
         None
       }
     }
@@ -181,8 +181,11 @@ class RouteRegistry {
 
   private val orderPreserver = new AtomicInteger(0)
   private[scalatra] val routes = new ConcurrentHashMap[Int, ScalatraRoute].asScala
+  private[scalatra] val matchCache = new ConcurrentHashMap[(LifeCycle, String), List[MatchedRoute[ScalatraAction]]].asScala
 
   def +=(kv: (Iterable[RouteMatcher], ScalatraAction)) = {
+    // adding a route invalidates the match cache
+    matchCache.clear()
     val (routeMatchers, action) = kv
     routes find {
       case (_, rm) => {
@@ -201,10 +204,19 @@ class RouteRegistry {
     }
   }
 
-  def -=(route: ScalatraRoute)  { routes find { case (_, rm) => rm == route } foreach { routes -= _._1 } }
-
-  def apply(lifeCycleStage: LifeCycle, path: String) = {
-    (routes.values filter { _.isDefinedAt(path) } flatMap { _.apply(lifeCycleStage, path) }).toList
+  def -=(route: ScalatraRoute)  {
+    routes find { case (_, rm) => rm == route } foreach {
+      // removing a route invalidates the match cache
+      matchCache.clear()
+      routes -= _._1
+    }
   }
 
+  def apply(lifeCycleStage: LifeCycle, path: String) = { // only calculate matched list once
+    matchCache.getOrElseUpdate(
+      (lifeCycleStage, path),
+      (routes.values filter { _.isDefinedAt(path) } flatMap { _.apply(lifeCycleStage, path) }).toList)
+  }
+
+  override def toString = routes map { case (_, route) => route } mkString ("[",", ", "]")
 }

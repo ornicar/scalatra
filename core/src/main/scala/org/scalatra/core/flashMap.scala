@@ -94,7 +94,7 @@ object FlashMapSupport {
  * }}}
  * @see FlashMap
  */
-trait FlashMapSupport extends ScalatraKernel {
+trait FlashMapSupport extends core.ScalatraKernel { 
   import FlashMapSupport.sessionKey
 
   abstract override def handle(req: HttpServletRequest, res: HttpServletResponse) {
