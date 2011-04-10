@@ -3,11 +3,10 @@ package org.scalatra.core
 import ScalatraKernel.MultiParams
 import org.scalatra.ssgi.core.HttpMethod
 import collection.JavaConverters._
-import annotation.tailrec
 import org.scalatra.util.MultiMap
 import util.matching.Regex
 import collection.mutable
-import java.util.concurrent.{ConcurrentHashMap, ConcurrentSkipListSet}
+import java.util.concurrent.ConcurrentHashMap
 import actors.threadpool.AtomicInteger
 
 trait ScalatraAction {
@@ -110,8 +109,7 @@ object ScalatraRoute {
 
 class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraRouteImplicits { // deliberately not a case class because this one is mutable
 
-  private val _actions = new mutable.LinkedHashSet[ScalatraAction] with mutable.SynchronizedSet[ScalatraAction]
-//  private var _matchCache = Map.empty[String, MultiMap]
+  private val _actions = new mutable.LinkedHashSet[ScalatraAction]
   def actions = _actions
 
   def isDefinedAt(matchers: Iterable[RouteMatcher]) = {
@@ -132,17 +130,14 @@ class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraR
   }
 
   private def matchRoute(path: String) = {
-//    _matchCache.get(path) orElse {
-      (Option(MultiMap()) /: routeMatchers) { (acc, rm) =>
-        acc flatMap { x =>
-          rm(path) map { y =>
-            val m = MultiMap(x ++ y)
-//            _matchCache += path -> m
-            m
-          }
+    (Option(MultiMap()) /: routeMatchers) { (acc, rm) =>
+      acc flatMap { x =>
+        rm(path) map { y =>
+          val m = MultiMap(x ++ y)
+          m
         }
       }
-//    }
+    }
   }
 
   def +=(action: ScalatraAction) = {
@@ -184,7 +179,7 @@ class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraR
 
 class RouteRegistry {
 
-  private val counter = new AtomicInteger(0)
+  private val orderPreserver = new AtomicInteger(0)
   private[scalatra] val routes = new ConcurrentHashMap[Int, ScalatraRoute].asScala
 
   def +=(kv: (Iterable[RouteMatcher], ScalatraAction)) = {
@@ -201,7 +196,7 @@ class RouteRegistry {
       }
     } getOrElse {
       val r = ScalatraRoute(routeMatchers, action)
-      routes += counter.incrementAndGet -> r
+      routes += orderPreserver.incrementAndGet -> r
       r
     }
   }
