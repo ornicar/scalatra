@@ -529,9 +529,19 @@ Another difference is that ScalatraFilter matches routes relative to the WAR's c
 
 ## Migration Guide
 
-### scalatra-2.0.0.M3 to scalatra-2.0.0.M4
+### scalatra-2.0.0.M3 to scalatra-2.0.0-SNAPSHOT
 
 1. Remove socket-io-java-dev.jar if you manually copied it into your lib directory.
+2. Packages have been reorganized now with an eye toward SSGI and abstraction away from the Servlet API.  Follow the deprecation warnings.  For a brute force approach, replace:
+
+        import org.scalatra._
+
+   with
+   
+        import org.scalatra.ssgi.core._
+        import org.scalatra.ssgi.servlet._
+        import org.scalatra.core._
+        import org.scalatra.servlet._
 
 ### scalatra-2.0.0.M2 to scalatra-2.0.0.M3
 
