@@ -25,6 +25,11 @@ class FilterTestServlet extends servlet.ScalatraServlet {
     }
   }
 
+  // TODO Why isn't this implicit in scope?
+  before(string2RouteMatcher("/matcher/*")) {
+    response.getWriter.write("before\n")
+  }
+
   get("/") {}
   
   get("/before-counter") { beforeCount }
@@ -54,6 +59,10 @@ class FilterTestFilter extends ScalatraFilter {
   post("/reset-counters") {
     beforeCount = 0
     pass
+  }
+
+  get("/matcher/specific") {
+    response.getWriter.write("get\n")
   }
 }
 
@@ -145,6 +154,12 @@ class FilterTest extends ScalatraFunSuite with BeforeAndAfterEach with ShouldMat
     get("/demons-be-here") {}
     get("/after-counter") {
       body should equal("2")
+    }
+  }
+
+  test("general before runs before specific get") {
+    get("/matcher/specific") {
+      body should equal ("before\nget\n")
     }
   }
 }
