@@ -250,6 +250,7 @@ trait ScalatraDsl extends ScalatraRouteImplicits {
     routes += ensureMatcher(routeMatchers) -> AfterFilter(() => fun)
   }
 
+
   /**
    * The Scalatra DSL core methods take a list of [[org.scalatra.RouteMatcher]] and a block as
    * the action body.

@@ -1,18 +1,18 @@
-package org.scalatra.akka
+package org.scalatra
+package akka
 
 import _root_.akka.http._
-import akka.actor.Actor._
-import akka.servlet.AkkaLoader
-import akka.config.Supervision._
+import _root_.akka.actor.Actor._
+import _root_.akka.servlet.AkkaLoader
+import _root_.akka.config.Supervision._
 import javax.servlet.{ServletContextEvent, ServletContextListener}
-import akka.remote.BootableRemoteActorService
+import _root_.akka.remote.BootableRemoteActorService
 import org.scalatra.core._
 import javax.servlet.http.HttpServletRequest
-import akka.stm._
-import akka.actor.{ActorRef, BootableActorLoaderService, Actor}
-import akka.transactor.Transactor
-import akka.dispatch.Dispatchers
-import org.scalatra.ssgi.core.HttpMethod
+import _root_.akka.actor.{ActorRef, BootableActorLoaderService, Actor}
+import _root_.akka.dispatch.Dispatchers
+import ssgi.core.HttpMethod
+import scala.util.DynamicVariable
 
 class ScalatraMistInitializer extends ServletContextListener  {
 
@@ -42,7 +42,7 @@ object ScalatraMistApp {
       response.getWriter println "Requesting %s but only have %s".format(request.getRequestURI, routes)
     }
 
-    def requestPath = null
+    def requestPath = if (request.getPathInfo != null) request.getPathInfo else request.getContextPath
 
     def receive = {
       case m: RequestMethod => {
@@ -50,19 +50,35 @@ object ScalatraMistApp {
       }
     }
 
+    def checkWithRequestPath(req: HttpServletRequest) = _request.withValue(req) {
+      routes(Actions, requestPath).isEmpty
+    }
+
   }
 }
+
+trait ScalatraMistRootApp extends Actor with Endpoint with ScalatraDsl {
+  
+}
+
 abstract class ScalatraMistApp(basePath: String) extends Actor with Endpoint with ScalatraDsl {
   import ScalatraMistApp._
 
   self.faultHandler = OneForOneStrategy(List(classOf[Throwable]), 5, 5000)
+
+  private val _request = new DynamicVariable[HttpServletRequest](null)
+  protected def request = _request.value
+  def requestPath = if (request.getPathInfo != null) request.getPathInfo else request.getContextPath
+  def hasMatchingRoute(req: HttpServletRequest) = _request.withValue(req) {
+    routes(Actions, requestPath).isEmpty
+  }
 
   // TODO: STM this thing? it should already be thread-safe so don't really see the point
   val routes = new RouteRegistry
   private var _handler: Option[ActorRef] = None
   protected val handlerConcurrency = 1
 
-  protected def hook(path: String) = !routes(Actions, path).isEmpty
+  protected def hook(path: String) = hasMatchingRoute(path)
   protected def provide(path: String) = _handler getOrElse {
     val h = actorOf(new ScalatraRouteHandler(basePath, routes, handlerConcurrency > 1))
     if (handlerConcurrency > 1) {

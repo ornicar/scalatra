@@ -112,6 +112,8 @@ class ScalatraProject(info: ProjectInfo)
   class CoreProject(info: ProjectInfo) extends DefaultProject(info) with ScalatraSubproject with TestWithScalatraTest {
     val mockito = "org.mockito" % "mockito-all" % "1.8.4" % "test"
     val description = "The core Scalatra library"
+
+//    override def parallelExecution = false
   }
 
   lazy val auth = project("auth", "scalatra-auth", new AuthProject(_), core)
