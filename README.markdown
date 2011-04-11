@@ -2,7 +2,7 @@ Scalatra is a tiny, [Sinatra](http://www.sinatrarb.com/)-like web framework for 
 
 ## Example
 
-    import org.scalatra._
+    import org.scalatra.servlet._
 
     class ScalatraExample extends ScalatraServlet {
       get("/") {
@@ -122,8 +122,8 @@ The route matcher may also be a regular expression.  Capture groups are accessib
 
 If you want to experiment with path patterns, it's very easy in the REPL.
 
-    scala> import org.scalatra.pattern._
-    import org.scalatra.pattern._
+    scala> import org.scalatra.core._
+    import org.scalatra.core._
 
     scala> val pattern = PathPatternParser.parseFrom("/foo/:bar")
     pattern: PathPattern = PathPattern(^/foo/([^/?]+)$,List(bar))
@@ -140,7 +140,8 @@ Obligatory scolding: the REPL is not a substitute for proper unit tests!
 
 By default, route patterns parsing is based on Sinatra.  Rails has a similar, but not identical, syntax, based on Rack::Mount's Strexp.  The path pattern parser is resolved implicitly, and may be overridden if you prefer an alternate syntax:
 
-    import org.scalatra._
+    import org.scalatra.core._
+    import org.scalatra.servlet._
 
     class RailsLikeRouting extends ScalatraFilter {
       implicit override def string2RouteMatcher(path: String) =
@@ -313,7 +314,8 @@ Scalatra provides optional support for [Scalate](http://scalate.fusesource.org/)
 
 2. Extend your application with `ScalateSupport`
 
-       import org.scalatra._
+       import org.scalatra.core._
+       import org.scalatra.servlet._
        import org.scalatra.scalate._
 
        class MyApplication extends ScalatraServlet with ScalateSupport {
@@ -340,7 +342,7 @@ Scalatra provides optional support for file uploads with <a href="http://commons
 
 2. Extend your application with `FileUploadSupport`
 
-        import org.scalatra.ScalatraServlet
+        import org.scalatra.servlet.ScalatraServlet
         import org.scalatra.fileupload.FileUploadSupport
 
         class MyApp extends ScalatraServlet with FileUploadSupport {
@@ -372,7 +374,7 @@ Scalatra provides optional support for websockets and comet through [socket.io](
 
 2. SocketIO mimics a socket connection so it's easiest if you just create a socketio servlet at /socket.io/*
 
-       import org.scalatra.ScalatraServlet
+       import org.scalatra.servlet.ScalatraServlet
        import org.scalatra.socketio.SocketIOSupport
 
        class MySocketIOServlet extends ScalatraServlet with SocketIOSupport {
