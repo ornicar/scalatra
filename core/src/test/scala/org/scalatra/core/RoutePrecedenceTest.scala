@@ -5,17 +5,15 @@ import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
 class RoutePrecedenceTestBaseServlet extends servlet.ScalatraServlet {
-  get("/override-route") {
+  get("/overriden-route") {
     "base"
   }
 }
 
 class RoutePrecedenceTestChildServlet extends RoutePrecedenceTestBaseServlet {
-  get("/override-route") {
+  get("/overriden-route") {
     "child"
   }
-
-
 
   get("/hide-route") {
     "hidden by earlier route"
@@ -53,13 +51,27 @@ class RoutePrecedenceTestChildServlet extends RoutePrecedenceTestBaseServlet {
   notFound {
     response.getWriter.write("c")
   }
+
+  get("/foo/specific") {
+    response.getWriter.write("1")
+    pass()
+  }
+
+  get("/foo/*") {
+    response.getWriter.write("2")
+    pass()
+  }
+
+  get("/foo/specific") {
+    response.getWriter.write("3")
+  }
 }
 
 class RoutePrecedenceTest extends ScalatraFunSuite with ShouldMatchers {
   addServlet(classOf[RoutePrecedenceTestChildServlet], "/*")
 
   test("Routes in child should override routes in base") {
-    get("/override-route") {
+    get("/overriden-route") {
       body should equal ("child")
     }
   }
@@ -89,6 +101,12 @@ class RoutePrecedenceTest extends ScalatraFunSuite with ShouldMatchers {
   test("does not keep executing routes without pass") {
     get("/do-not-pass") {
       body should equal ("1")
+    }
+  }
+
+  test("routes run in declared order regardless of specificity") {
+    get("/foo/specific") {
+      body should equal ("123")
     }
   }
 }
