@@ -5,9 +5,9 @@ import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
 class RoutePrecedenceTestBaseServlet extends servlet.ScalatraServlet {
-//  get("/override-route") {
-//    "base"
-//  }
+  get("/override-route") {
+    "base"
+  }
 }
 
 class RoutePrecedenceTestChildServlet extends RoutePrecedenceTestBaseServlet {
@@ -16,13 +16,15 @@ class RoutePrecedenceTestChildServlet extends RoutePrecedenceTestBaseServlet {
   }
 
 
-  get("/hide-route") {
-    "visible"
-  }
 
   get("/hide-route") {
     "hidden by earlier route"
   }
+
+  get("/hide-route") {
+    "visible"
+  }
+
 
   get("/pass") {
     response.getWriter.write("1")

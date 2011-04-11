@@ -23,9 +23,9 @@ trait ScalatraAction {
   }
 }
 case class Action(method: HttpMethod, action: () => Any) extends ScalatraAction
-sealed trait ScalatraFilter extends ScalatraAction
-case class BeforeFilter(action: () => Any) extends ScalatraFilter
-case class AfterFilter(action: () => Any) extends ScalatraFilter
+sealed trait ScalatraFilterAction extends ScalatraAction
+case class BeforeFilter(action: () => Any) extends ScalatraFilterAction
+case class AfterFilter(action: () => Any) extends ScalatraFilterAction
 
 case class MatchedRoute[ActionType <: ScalatraAction](routeParams: MultiParams, actions: List[ActionType])
 
@@ -123,7 +123,12 @@ class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraR
       matchRoute(path) map { MatchedRoute(_, (actions filter { _.isInstanceOf[BeforeFilter] } toList)) }
     }
     case Actions => {
-      matchRoute(path) map { MatchedRoute(_, (actions find { _.isInstanceOf[Action] } toList)) }
+      matchRoute(path) map { MatchedRoute(_, (actions filter { _.isInstanceOf[Action] } toList)) }
+      // @rossabaker: below it is how to reverse the routes to match
+      // way 1:
+      // matchRoute(path) map { MatchedRoute(_, (actions.toList.reverse filter { _.isInstanceOf[Action] } toList)) }
+      // way 2:
+      // matchRoute(path) map { MatchedRoute(_, (actions filter { _.isInstanceOf[Action] } toList).reverse) }
     }
     case AfterActions => {
       matchRoute(path) map { MatchedRoute(_, (actions filter { _.isInstanceOf[AfterFilter] } toList)) }
@@ -143,14 +148,18 @@ class ScalatraRoute(val routeMatchers: Iterable[RouteMatcher]) extends ScalatraR
 
   def +=(action: ScalatraAction) = {
     action match {
-      case a: ScalatraFilter => {
-        _actions += a
-      }
-      case a => {
-        val newActions = (actions filterNot { _.isInstanceOf[Action] }) + a
+      case a: Action => {
+        val newActions = (actions filterNot {
+          case b: Action => b.method == a.method
+          case _ => false
+        }) + a
         _actions.clear()
         _actions ++= newActions
       }
+      case a => {
+        _actions += a
+      }
+
     }
     this
   }
