@@ -25,10 +25,6 @@ class FilterTestServlet extends servlet.ScalatraServlet {
     }
   }
 
-  beforeSome("/matcher/*") {
-    response.getWriter.write("before\n")
-  }
-
   get("/") {}
   
   get("/before-counter") { beforeCount }
@@ -53,6 +49,10 @@ class FilterTestFilter extends ScalatraFilter {
   beforeAll {
     beforeCount += 1
     response.setHeader("filterBeforeCount", beforeCount.toString)
+  }
+
+  beforeSome("/matcher/*") {
+    response.getWriter.write("before\n")
   }
 
   post("/reset-counters") {
@@ -157,11 +157,11 @@ class FilterTest extends ScalatraFunSuite with BeforeAndAfterEach with ShouldMat
   }
 
   test("general before runs before specific get") {
-    pendingUntilFixed {
+//    pendingUntilFixed {
       get("/matcher/specific") {
         body should equal ("before\nget\n")
       }
-    }
+//    }
   }
 }
 
