@@ -8,7 +8,7 @@ import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 
 class ScalatraSuiteTestServlet extends servlet.ScalatraServlet {
-  before {
+  beforeAll {
     contentType = "text/html; charset=utf-8"
   }
 

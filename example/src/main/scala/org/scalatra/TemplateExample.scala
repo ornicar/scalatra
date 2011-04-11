@@ -41,7 +41,7 @@ class TemplateExample extends servlet.ScalatraServlet with core.UrlSupport /*wit
     }
   }
 
-  before {
+  beforeAll {
     contentType = "text/html"
   }
 

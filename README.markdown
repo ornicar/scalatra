@@ -196,18 +196,29 @@ This behavior may be customized for these or other return types by overriding `r
 
 ## Filters
 
-Before filters are evaluated before each request within the same context as the routes.
+Before filters are evaluated before each request within the same context as the routes.  `beforeAll` runs before all
+routes.  `beforeSome` takes the same matchers as a standard route.
 
-    before {
+    beforeAll {
       // Default all responses to text/html
       contentType = "text/html"
     }
 
-After filters are evaluated after each request, but before the action result is rendered, within the same context as the routes.
+    beforeSome("/protected/*") {
+      if (!isAuthenticated) halt(403, "Scram!")
+    }
 
-    after {
+After filters are evaluated after each request, but before the action result is rendered, within the same context as
+the routes.  `afterAll` runs after all routes.  `afterSome` takes the same matchers as a standard route.
+
+    afterAll {
       if (response.status >= 500)
         println("OMG! ONOZ!")
+    }
+
+    afterSome("/protected/*") {
+      log.info(session("username")+" was here"):w
+
     }
 
 ## Halting
@@ -527,9 +538,10 @@ Another difference is that ScalatraFilter matches routes relative to the WAR's c
 
 ## Migration Guide
 
-### scalatra-2.0.0.M3 to scalatra-2.0.0.M4
+### scalatra-2.0.0.M3 to master
 
 1. Remove socket-io-java-dev.jar if you manually copied it into your lib directory.
+2. `before` and `after` have been deprecated in favor of `beforeAll` and `afterAll` to accomodate the new `beforeSome` and `afterSome`.
 
 ### scalatra-2.0.0.M2 to scalatra-2.0.0.M3
 

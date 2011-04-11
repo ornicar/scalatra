@@ -236,13 +236,17 @@ trait ScalatraDsl extends ScalatraRouteImplicits {
   private def ensureMatcher(routeMatchers: Iterable[RouteMatcher]) =
     if (routeMatchers.isEmpty) List(matchAllRoutes).toIterable else routeMatchers
 
-  def before(fun: => Any) { before(matchAllRoutes)(fun) }
-  def before(routeMatchers: RouteMatcher*)(fun: => Any) {
+  def beforeAll(fun: => Any) { beforeSome(matchAllRoutes)(fun) }
+  @deprecated("Use beforeAll")
+  def before(fun: => Any) = beforeAll(fun)
+  def beforeSome(routeMatchers: RouteMatcher*)(fun: => Any) {
     routes += ensureMatcher(routeMatchers) -> BeforeFilter(() => fun)
   }
 
-  def after(fun: => Any) { after(matchAllRoutes)(fun) }
-  def after(routeMatchers: RouteMatcher*)(fun: => Any) {
+  def afterAll(fun: => Any) { afterSome(matchAllRoutes)(fun) }
+  @deprecated("Use afterAll")
+  def after(fun: => Any) = beforeAll(fun)
+  def afterSome(routeMatchers: RouteMatcher*)(fun: => Any) {
     routes += ensureMatcher(routeMatchers) -> AfterFilter(() => fun)
   }
 
