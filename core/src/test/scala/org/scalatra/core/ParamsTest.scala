@@ -4,6 +4,7 @@ package core
 import java.util.NoSuchElementException
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
+import servlet.ScalatraServlet
 
 object ParamsTestServlet {
   val NoSuchElement = "No Such Element"

@@ -1,6 +1,6 @@
 package examples
 
-import org.scalatra._
+import org.scalatra.servlet.ScalatraServlet
 
 // This Scalatra application is a simple servlet.
 class ScalatraExample extends ScalatraServlet {

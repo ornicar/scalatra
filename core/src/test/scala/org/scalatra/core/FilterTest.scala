@@ -4,6 +4,7 @@ package core
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
+import servlet.{ScalatraFilter, ScalatraServlet}
 
 class FilterTestServlet extends ScalatraServlet {
   var beforeCount = 0

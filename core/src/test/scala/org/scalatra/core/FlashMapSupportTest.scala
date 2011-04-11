@@ -3,6 +3,7 @@ package core
 
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
+import servlet.{ScalatraFilter, ScalatraServlet}
 
 class FlashMapSupportTestServlet extends ScalatraServlet with FlashMapSupport {
   post("/message") {

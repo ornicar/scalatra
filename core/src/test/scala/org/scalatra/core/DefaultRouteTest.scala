@@ -3,6 +3,7 @@ package core
 
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
+import servlet.ScalatraServlet
 
 object DefaultRouteTest {
   val existingRoute = "/existing-route"

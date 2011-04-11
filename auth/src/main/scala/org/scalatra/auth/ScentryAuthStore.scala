@@ -3,6 +3,8 @@ package auth
 
 import javax.servlet.http.HttpSession
 import ssgi.servlet.SweetCookies
+import core.{CookieSupport, ScalatraKernel}
+import ssgi.core.{Cookie, CookieOptions}
 
 object ScentryAuthStore {
 

@@ -5,6 +5,7 @@ import javax.servlet.http.{Cookie => ServletCookie}
 import test.scalatest.ScalatraFunSuite
 import org.scalatest.matchers.ShouldMatchers
 import org.eclipse.jetty.testing.HttpTester
+import servlet.ScalatraServlet
 
 class RequestCookiesTest extends ScalatraFunSuite with ShouldMatchers {
   addServlet(new ScalatraServlet {

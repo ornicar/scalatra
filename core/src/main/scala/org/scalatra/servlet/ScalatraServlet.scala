@@ -3,7 +3,7 @@ package servlet
 
 import javax.servlet._
 import javax.servlet.http._
-import org.scalatra.Initializable
+import core.{Initializable, ScalatraKernel}
 
 abstract class ScalatraServlet
   extends HttpServlet 

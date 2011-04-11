@@ -1,9 +1,12 @@
 package org.scalatra
+package example
 
 import scala.xml.{Text, Node}
 import org.apache.commons.io.IOUtils
 import fileupload.FileUploadSupport
 import scalate.ScalateSupport
+import core.{FlashMapSupport, UrlSupport}
+import servlet.ScalatraServlet
 
 class TemplateExample extends ScalatraServlet with UrlSupport /*with FileUploadSupport*/ with FlashMapSupport with ScalateSupport {
 

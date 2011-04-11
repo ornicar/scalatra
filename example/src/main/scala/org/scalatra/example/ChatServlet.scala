@@ -1,7 +1,9 @@
 package org.scalatra
+package example
 
 import socketio.SocketIOSupport
 import com.glines.socketio.server.SocketIOFrame
+import servlet.ScalatraServlet
 
 class ChatServlet extends ScalatraServlet with SocketIOSupport {
 

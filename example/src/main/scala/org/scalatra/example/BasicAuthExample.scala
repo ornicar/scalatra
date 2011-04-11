@@ -1,8 +1,11 @@
 package org.scalatra
+package example
 
 import auth.strategy.{BasicAuthStrategy, BasicAuthSupport}
 import auth.{ScentrySupport, ScentryConfig}
-import org.scalatra.BasicAuthExample.AuthenticationSupport
+import core.ScalatraKernel
+import servlet.ScalatraServlet
+import example.BasicAuthExample.AuthenticationSupport
 
 object BasicAuthExample {
 

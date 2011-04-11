@@ -7,6 +7,7 @@ import org.scalatest.matchers.ShouldMatchers
 import org.eclipse.jetty.testing.HttpTester
 import java.net.URLEncoder
 import test.scalatest.ScalatraFunSuite
+import servlet.ScalatraServlet
 
 class ContentTypeTestServlet extends ScalatraServlet {
   get("/json") {

@@ -4,6 +4,7 @@ package core
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraSuite
+import servlet.ScalatraServlet
 
 class RemoveRouteServlet extends ScalatraServlet {
   val foo = get("/foo") { "foo" }

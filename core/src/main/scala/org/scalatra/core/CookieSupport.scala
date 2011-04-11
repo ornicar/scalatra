@@ -4,6 +4,7 @@ package core
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse, Cookie => ServletCookie}
 import scala.util.DynamicVariable
 import ssgi.servlet.SweetCookies
+import ssgi.core.{Cookie, CookieOptions}
 
 trait CookieSupport extends Handler {
   self: ScalatraKernel =>

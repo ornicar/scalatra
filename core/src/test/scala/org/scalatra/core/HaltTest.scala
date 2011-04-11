@@ -4,6 +4,7 @@ package core
 import org.scalatest.matchers.ShouldMatchers
 import javax.servlet.http.HttpServletResponse
 import test.scalatest.ScalatraFunSuite
+import servlet.ScalatraServlet
 
 class HaltTestServlet extends ScalatraServlet {
   get("/halts-response") {

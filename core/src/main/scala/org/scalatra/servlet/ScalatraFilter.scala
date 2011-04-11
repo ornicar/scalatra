@@ -4,7 +4,7 @@ package servlet
 import scala.util.DynamicVariable
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import javax.servlet._
-import org.scalatra.Initializable
+import core.{Initializable, ScalatraKernel}
 
 trait ScalatraFilter extends Filter with ScalatraKernel with Initializable {
   import ScalatraKernel._

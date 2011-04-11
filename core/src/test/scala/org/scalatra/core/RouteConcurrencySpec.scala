@@ -6,6 +6,7 @@ import org.scalatest.matchers.ShouldMatchers
 import ssgi.core.HttpMethod
 import test.scalatest.ScalatraSuite
 import scala.concurrent.ops._
+import servlet.ScalatraServlet
 
 class RouteConcurrencyServlet extends ScalatraServlet {
   for {

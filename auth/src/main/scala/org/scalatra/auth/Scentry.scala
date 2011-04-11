@@ -6,6 +6,7 @@ import scala.PartialFunction
 import ScentryAuthStore.{SessionAuthStore, ScentryAuthStore}
 import util.RicherString
 import collection.immutable.List._
+import core.ScalatraKernel
 
 object Scentry {
 

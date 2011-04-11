@@ -1,6 +1,8 @@
 package org.scalatra
+package example
 
 import socketio.SocketIOSupport
+import servlet.ScalatraServlet
 
 
 class SocketIOExample extends ScalatraServlet with SocketIOSupport {

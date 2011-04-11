@@ -2,6 +2,7 @@ package org.scalatra
 package core
 
 import test.specs.ScalatraSpecification
+import servlet.ScalatraServlet
 
 class CsrfTokenServlet extends ScalatraServlet with CsrfTokenSupport {
   get("/renderForm") {

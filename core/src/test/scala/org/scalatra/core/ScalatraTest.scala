@@ -8,6 +8,7 @@ import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
 import java.io.File
 import util.io.withTempFile
+import servlet.ScalatraServlet
 
 class ScalatraTestServlet extends ScalatraServlet {
   get("/") {

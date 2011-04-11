@@ -11,7 +11,8 @@ import com.glines.socketio.server.SocketIOFrame.FrameType
 import java.util.concurrent.{CopyOnWriteArrayList, ConcurrentHashMap}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import util.RicherString._
-import org.scalatra.Initializable
+import core.{GenerateId, Initializable}
+import servlet.ScalatraServlet
 
 object SocketIOSupport {
   val BUFFER_SIZE_INIT_PARAM = "bufferSize"

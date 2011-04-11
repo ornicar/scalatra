@@ -1,4 +1,7 @@
 package org.scalatra
+package example
+
+import servlet.ScalatraFilter
 
 class FilterExample extends ScalatraFilter {
   get("/filter-example") {

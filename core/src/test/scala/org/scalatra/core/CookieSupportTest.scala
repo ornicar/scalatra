@@ -3,6 +3,8 @@ package core
 
 import test.scalatest.ScalatraFunSuite
 import org.scalatest.matchers.MustMatchers
+import servlet.ScalatraServlet
+import ssgi.core.CookieOptions
 
 class CookieSupportServlet extends ScalatraServlet with CookieSupport {
 

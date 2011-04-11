@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
 import test.scalatest.ScalatraFunSuite
+import servlet.ScalatraServlet
 
 class FileUploadSupportTestServlet extends ScalatraServlet with FileUploadSupport {
   post("""/multipart.*""".r) {

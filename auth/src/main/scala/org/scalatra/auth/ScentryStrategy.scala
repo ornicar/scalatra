@@ -2,6 +2,8 @@ package org.scalatra
 package auth
 
 import javax.servlet.http.{HttpSession, HttpServletRequest, Cookie}
+import ssgi.servlet.{RichRequest, RichSession}
+import core.ScalatraKernel
 
 trait ScentryStrategy[UserType <: AnyRef] {
 

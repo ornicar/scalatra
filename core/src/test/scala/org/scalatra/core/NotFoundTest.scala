@@ -3,6 +3,7 @@ package core
 
 import org.scalatest.matchers.ShouldMatchers
 import test.scalatest.ScalatraFunSuite
+import servlet.ScalatraServlet
 
 class DefaultNotFoundTestServlet extends ScalatraServlet
 class CustomNotFoundTestServlet extends ScalatraServlet {

@@ -3,6 +3,7 @@ package servlet
 
 import javax.servlet.http.{HttpServletRequest, HttpServletResponseWrapper, HttpServletResponse}
 import java.util.concurrent.atomic.AtomicInteger
+import core.{Handler, ScalatraKernel}
 
 /**
  * Mixin to ScalatraKernel that allows the retrieval of the HttpStatus.

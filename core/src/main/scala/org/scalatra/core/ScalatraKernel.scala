@@ -14,6 +14,7 @@ import java.io.{File, FileInputStream}
 import java.util.concurrent.ConcurrentHashMap
 import scala.annotation.tailrec
 import util.{MultiMap, MapWithIndifferentAccess, MultiMapHeadView, using}
+import ssgi.servlet.{RichServletContext, RichSession}
 
 object ScalatraKernel
 {

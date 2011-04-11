@@ -1,4 +1,8 @@
 package org.scalatra
+package example
+
+import core.CookieSupport
+import servlet.ScalatraServlet
 
 class CookiesExample extends ScalatraServlet with CookieSupport {
   get("/cookies-example") {
