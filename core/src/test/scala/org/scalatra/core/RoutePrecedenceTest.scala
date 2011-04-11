@@ -8,6 +8,10 @@ class RoutePrecedenceTestBaseServlet extends servlet.ScalatraServlet {
 //  get("/override-route") {
 //    "base"
 //  }
+
+  get("/inherit/specific") {
+    response.getWriter.write("base /inherit/specific\n")
+  }
 }
 
 class RoutePrecedenceTestChildServlet extends RoutePrecedenceTestBaseServlet {
@@ -51,6 +55,15 @@ class RoutePrecedenceTestChildServlet extends RoutePrecedenceTestBaseServlet {
   notFound {
     response.getWriter.write("c")
   }
+
+  get("/inherit/*") {
+    response.getWriter.write("child /inherit/*\n")
+  }
+
+  get("/inherit/specific") {
+    response.getWriter.write("child /inherit/specific\n")
+    pass()
+  }
 }
 
 class RoutePrecedenceTest extends ScalatraFunSuite with ShouldMatchers {
@@ -87,6 +100,12 @@ class RoutePrecedenceTest extends ScalatraFunSuite with ShouldMatchers {
   test("does not keep executing routes without pass") {
     get("/do-not-pass") {
       body should equal ("1")
+    }
+  }
+
+  test("routes run in order, regardless of specificity") {
+    get("/inherit/specific") {
+      body should equal("child /inherit/specific\nchild /inherit/*\n")
     }
   }
 }
