@@ -69,9 +69,8 @@ abstract class ScalatraMistApp(basePath: String) extends Actor with Endpoint wit
   private val _request = new DynamicVariable[HttpServletRequest](null)
   protected def request = _request.value
   def requestPath = if (request.getPathInfo != null) request.getPathInfo else request.getContextPath
-  def hasMatchingRoute(req: HttpServletRequest) = _request.withValue(req) {
-    routes(Actions, requestPath).isEmpty
-  }
+  def hasMatchingRoute(req: HttpServletRequest): Boolean = _request.withValue(req) { hasMatchingRoute(requestPath) }
+  def hasMatchingRoute(path: String): Boolean = routes(Actions, path).isEmpty
 
   // TODO: STM this thing? it should already be thread-safe so don't really see the point
   val routes = new RouteRegistry
