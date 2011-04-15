@@ -6,7 +6,7 @@ import mock.Mockito
 import org.mockito.Matchers._
 import runner.{ScalaTest, JUnit}
 import javax.servlet.http.HttpSession
-import ssgi.servlet.SweetCookies
+import core.ScalatraKernel
 
 object ScentrySpec extends Specification with Mockito with JUnit with ScalaTest {
   detailedDiffs

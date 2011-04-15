@@ -1,20 +1,14 @@
 package org.scalatra
 package core
 
-import javax.servlet._
-import javax.servlet.http._
 import scala.util.DynamicVariable
 import scala.util.matching.Regex
 import scala.collection.JavaConversions._
 import scala.collection.mutable.{ConcurrentMap, ListBuffer}
-import scala.xml.NodeSeq
 import ssgi.core._
-import util.io.zeroCopy
-import java.io.{File, FileInputStream}
 import java.util.concurrent.ConcurrentHashMap
 import scala.annotation.tailrec
-import util.{MultiMap, MapWithIndifferentAccess, MultiMapHeadView, using}
-import ssgi.servlet.{RichServletContext, RichSession}
+import util.{MultiMap, MapWithIndifferentAccess, MultiMapHeadView}
 
 object ScalatraKernel
 {
@@ -56,16 +50,10 @@ trait ScalatraKernel extends Handler with Initializable
     map
   }
 
-  def contentType = response.getContentType
-  def contentType_=(value: String): Unit = response.setContentType(value)
+  def contentType: String
+  def contentType_=(value: String): Unit
 
   protected val defaultCharacterEncoding = "UTF-8"
-  protected val _response   = new DynamicVariable[HttpServletResponse](null)
-  protected val _request    = new DynamicVariable[HttpServletRequest](null)
-
-  protected implicit def requestWrapper(r: HttpServletRequest) = RichRequest(r)
-  protected implicit def sessionWrapper(s: HttpSession) = new RichSession(s)
-  protected implicit def servletContextWrapper(sc: ServletContext) = new RichServletContext(sc)
 
   protected[scalatra] class Route(val routeMatchers: Iterable[RouteMatcher], val action: Action) {
     def apply(realPath: String): Option[Any] = RouteMatcher.matchRoute(routeMatchers) flatMap { invokeAction(_) }
@@ -82,7 +70,6 @@ trait ScalatraKernel extends Handler with Initializable
 
     override def toString = routeMatchers.toString()
   }
-
 
   /**
    * Pluggable way to convert Strings into RouteMatchers.  By default, we
@@ -116,42 +103,6 @@ trait ScalatraKernel extends Handler with Initializable
   protected implicit def booleanBlock2RouteMatcher(matcher: => Boolean): RouteMatcher =
     () => { if (matcher) Some(MultiMap()) else None }
 
-  def handle(request: HttpServletRequest, response: HttpServletResponse) {
-    // As default, the servlet tries to decode params with ISO_8859-1.
-    // It causes an EOFException if params are actually encoded with the other code (such as UTF-8)
-    if (request.getCharacterEncoding == null)
-      request.setCharacterEncoding(defaultCharacterEncoding)
-
-    val realMultiParams = request.getParameterMap.asInstanceOf[java.util.Map[String,Array[String]]].toMap
-      .transform { (k, v) => v: Seq[String] }
-
-    response.setCharacterEncoding(defaultCharacterEncoding)
-
-    _request.withValue(request) {
-      _response.withValue(response) {
-        _multiParams.withValue(Map() ++ realMultiParams) {
-          val result = try {
-            beforeFilters foreach { _() }
-            routes(effectiveMethod).toStream.flatMap { _(requestPath) }.headOption.getOrElse(doNotFound())
-          }
-          catch {
-            case e => handleError(e)
-          }
-          finally {
-            afterFilters foreach { _() }
-          }
-          renderResponse(result)
-        }
-      }
-    }
-  }
-
-  protected def effectiveMethod: HttpMethod =
-    HttpMethod(request.getMethod) match {
-      case Head => Get
-      case x => x
-    }
-
   def requestPath: String
 
   protected val beforeFilters = new ListBuffer[() => Any]
@@ -169,21 +120,12 @@ trait ScalatraKernel extends Handler with Initializable
 
   protected def renderError : PartialFunction[Throwable, Any] = defaultRenderError
 
-  protected final def defaultRenderError : PartialFunction[Throwable, Any] = {
-    case HaltException(Some(code), Some(msg)) => response.sendError(code, msg)
-    case HaltException(Some(code), None) => response.sendError(code)
-    case HaltException(None, _) =>
-    case e => {
-      status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-      _caughtThrowable.withValue(e) { errorHandler() }
-    }
-  }
+  protected def defaultRenderError: PartialFunction[Throwable, Any]
 
   protected var errorHandler: Action = { () => throw caughtThrowable }
   def error(fun: => Any) = errorHandler = { () => fun }
 
-  private val _caughtThrowable = new DynamicVariable[Throwable](null)
-  protected def caughtThrowable = _caughtThrowable.value
+  protected def caughtThrowable: Throwable
 
   protected def renderResponse(actionResult: Any) {
     if (contentType == null)
@@ -213,17 +155,7 @@ trait ScalatraKernel extends Handler with Initializable
 
   protected def renderPipeline: PartialFunction[Any, Any] = defaultRenderResponse
 
-  protected final def defaultRenderResponse: PartialFunction[Any, Any] = {
-    case bytes: Array[Byte] =>
-      response.getOutputStream.write(bytes)
-    case file: File =>
-      using(new FileInputStream(file)) { in => zeroCopy(in, response.getOutputStream) }
-    case _: Unit =>
-    // If an action returns Unit, it assumes responsibility for the response
-    case x: Any  =>
-      response.getWriter.print(x.toString)
-  }
-
+  protected def defaultRenderResponse: PartialFunction[Any, Any]
   protected[scalatra] val _multiParams = new DynamicVariable[MultiMap](new MultiMap)
   protected def multiParams: MultiParams = (_multiParams.value).withDefaultValue(Seq.empty)
   /*
@@ -235,15 +167,9 @@ trait ScalatraKernel extends Handler with Initializable
   }
   def params = _params
 
-  def redirect(uri: String) = (_response value) sendRedirect uri
-  implicit def request = _request value
-  implicit def response = _response value
-  def session = request.getSession
-  def sessionOption = request.getSession(false) match {
-    case s: HttpSession => Some(s)
-    case null => None
-  }
-  def status(code: Int) = (_response value) setStatus code
+  def redirect(uri: String): Unit
+
+  def status(code: Int): Unit
 
   def halt(code: Int, msg: String) = throw new HaltException(Some(code), Some(msg))
   def halt(code: Int) = throw new HaltException(Some(code), None)
@@ -350,14 +276,10 @@ trait ScalatraKernel extends Handler with Initializable
     }
   }
 
-  private var config: Config = _
+  protected var config: Config = _
   def initialize(config: Config) = this.config = config
 
-  def initParameter(name: String): Option[String] = config match {
-    case config: ServletConfig => Option(config.getInitParameter(name))
-    case config: FilterConfig => Option(config.getInitParameter(name))
-    case _ => None
-  }
+  def initParameter(name: String): Option[String]
 
   def environment: String = System.getProperty(EnvironmentKey, initParameter(EnvironmentKey).getOrElse("development"))
   def isDevelopmentMode = environment.toLowerCase.startsWith("dev")

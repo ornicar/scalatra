@@ -5,6 +5,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import scala.util.DynamicVariable
 import javax.servlet.{FilterConfig, ServletConfig}
 import core.{CookieSupport, Handler, Initializable, ScalatraKernel}
+import servlet.ServletKernel
 
 trait ScentryConfig {
   val login = "/login"
@@ -14,7 +15,7 @@ trait ScentryConfig {
 }
 
 trait ScentrySupport[TypeForUser <: AnyRef] extends Handler with Initializable with CookieSupport {
-  self : ScalatraKernel =>
+  self : ServletKernel =>
 
   type UserType = TypeForUser
   type ScentryConfiguration <: ScentryConfig

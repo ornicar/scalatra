@@ -1,16 +1,17 @@
 package org.scalatra
 package auth
 
-import javax.servlet.http.{HttpSession, HttpServletRequest, Cookie}
+import javax.servlet.http.{HttpSession, HttpServletRequest}
 import ssgi.servlet.{RichRequest, RichSession}
 import core.ScalatraKernel
+import servlet.ServletKernel
 
 trait ScentryStrategy[UserType <: AnyRef] {
 
   protected implicit def sessionWrapper(s: HttpSession) = new RichSession(s)
   protected implicit def requestWrapper(s: HttpServletRequest) = new RichRequest(s)
 
-  protected val app: ScalatraKernel
+  protected val app: ServletKernel
   def name: Symbol = 'NameMe
 
   def registerWith(registrar: Scentry[UserType]) {

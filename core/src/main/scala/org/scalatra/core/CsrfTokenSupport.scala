@@ -2,6 +2,7 @@ package org.scalatra
 package core
 
 import java.security.SecureRandom
+import servlet.ServletKernel // TODO decouple
 
 object GenerateId {
   def apply(): String = {
@@ -27,7 +28,7 @@ object CsrfTokenSupport {
   val DefaultKey = "org.scalatra.CsrfTokenSupport.key"
 }
 
-trait CsrfTokenSupport { self: ScalatraKernel =>
+trait CsrfTokenSupport { self: ServletKernel =>
   protected def csrfKey = CsrfTokenSupport.DefaultKey
   protected def csrfToken = session(csrfKey).asInstanceOf[String]
 

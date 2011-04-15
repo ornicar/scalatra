@@ -6,7 +6,7 @@ import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import javax.servlet._
 import core.{Initializable, ScalatraKernel}
 
-trait ScalatraFilter extends Filter with ScalatraKernel with Initializable {
+trait ScalatraFilter extends Filter with ServletKernel with Initializable {
   import ScalatraKernel._
 
   private val _filterChain = new DynamicVariable[FilterChain](null)

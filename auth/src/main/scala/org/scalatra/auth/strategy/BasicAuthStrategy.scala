@@ -8,7 +8,7 @@ import util.RicherString._
 import java.nio.charset.Charset
 import java.util.Locale
 import javax.servlet.http.{ HttpServletRequest}
-import core.ScalatraKernel
+import servlet.ServletKernel
 
 trait RemoteAddress { self: ScentryStrategy[_]  =>
 
@@ -25,7 +25,7 @@ trait RemoteAddress { self: ScentryStrategy[_]  =>
  * for more details on usage check:
  * https://gist.github.com/732347
  */
-trait BasicAuthSupport[UserType <: AnyRef] { self: (ScalatraKernel with ScentrySupport[UserType])  =>
+trait BasicAuthSupport[UserType <: AnyRef] { self: (ServletKernel with ScentrySupport[UserType])  =>
 
   val realm: String
 
@@ -72,7 +72,7 @@ object BasicAuthStrategy {
     def password = credentials map { _._2 } getOrElse null
   }
 }
-abstract class BasicAuthStrategy[UserType <: AnyRef](protected val app: ScalatraKernel, realm: String)
+abstract class BasicAuthStrategy[UserType <: AnyRef](protected val app: ServletKernel, realm: String)
   extends ScentryStrategy[UserType]
   with RemoteAddress {
 

@@ -5,13 +5,12 @@ import java.io.PrintWriter
 import javax.servlet.{ServletContext, ServletConfig, FilterConfig}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import org.fusesource.scalate.TemplateEngine
-import org.fusesource.scalate.servlet.{ServletRenderContext, ServletTemplateEngine}
 import java.lang.Throwable
+import servlet.ServletKernel
+import org.fusesource.scalate.servlet.{Config, ServletRenderContext, ServletTemplateEngine}
+import core.{Handler, Initializable}
 
-trait ScalateSupport extends ScalatraKernel {
-  self: {
-    def servletContext: ServletContext
-  } =>
+trait ScalateSupport extends ServletKernel {
 
   protected var templateEngine: TemplateEngine = _
 
@@ -47,7 +46,7 @@ trait ScalateSupport extends ScalatraKernel {
   def renderTemplate(path: String, attributes: (String, Any)*) = 
     createRenderContext.render(path, Map(attributes : _*))
 
-  override protected def handleError(e: Throwable) =
+  abstract override protected def handleError(e: Throwable) =
     try {
       super.handleError(e)
     }

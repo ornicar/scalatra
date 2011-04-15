@@ -2,8 +2,9 @@ package org.scalatra.core
 
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import java.net.URI
+import org.scalatra.servlet.ServletKernel // TODO decouple
 
-trait SslRequirement extends Handler { self: ScalatraKernel =>
+trait SslRequirement extends Handler { self: ServletKernel =>
   abstract override def handle(req: HttpServletRequest, res: HttpServletResponse) {
     _request.withValue(req) {
       _response.withValue(res) {

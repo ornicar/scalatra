@@ -3,11 +3,12 @@ package core
 
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse, Cookie => ServletCookie}
 import scala.util.DynamicVariable
-import ssgi.servlet.SweetCookies
+import ssgi.servlet.SweetCookies // TODO decouple
 import ssgi.core.{Cookie, CookieOptions}
+import servlet.ServletKernel // TODO decouple
 
 trait CookieSupport extends Handler {
-  self: ScalatraKernel =>
+  self: ServletKernel =>
 
   implicit def cookieOptions: CookieOptions = _cookieOptions.value
 

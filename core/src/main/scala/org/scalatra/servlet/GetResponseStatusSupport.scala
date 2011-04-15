@@ -9,7 +9,7 @@ import core.{Handler, ScalatraKernel}
  * Mixin to ScalatraKernel that allows the retrieval of the HttpStatus.
  * The response.getStatus() method was not added until Servlet 3.0.
  */
-trait GetResponseStatusSupport extends Handler { self: ScalatraKernel =>
+trait GetResponseStatusSupport extends Handler { self: ServletKernel =>
 
   abstract override def handle(req: HttpServletRequest, res: HttpServletResponse) {
     super.handle(req, new ScalatraGetStatusServletResponseWrapper(res))

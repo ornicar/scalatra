@@ -6,11 +6,11 @@ import scala.PartialFunction
 import ScentryAuthStore.{SessionAuthStore, ScentryAuthStore}
 import util.RicherString
 import collection.immutable.List._
-import core.ScalatraKernel
+import servlet.ServletKernel
 
 object Scentry {
 
-  type StrategyFactory[UserType <: AnyRef] = ScalatraKernel => ScentryStrategy[UserType]
+  type StrategyFactory[UserType <: AnyRef] = ServletKernel => ScentryStrategy[UserType]
 
   private val _globalStrategies = new HashMap[Symbol, StrategyFactory[_ <: AnyRef]]()
 
@@ -24,14 +24,14 @@ object Scentry {
 }
 
 class Scentry[UserType <: AnyRef](
-        app: ScalatraKernel,
+        app: ServletKernel,
         serialize: PartialFunction[UserType, String],
         deserialize: PartialFunction[String, UserType] ) {
 
   import RicherString._
 
   type StrategyType = ScentryStrategy[UserType]
-  type StrategyFactory = ScalatraKernel => StrategyType
+  type StrategyFactory = ServletKernel => StrategyType
 
   import Scentry._
   private val _strategies = new HashMap[Symbol, StrategyFactory]()

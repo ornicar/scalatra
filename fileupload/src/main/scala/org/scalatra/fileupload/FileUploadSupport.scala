@@ -10,6 +10,8 @@ import java.util.{List => JList, HashMap => JHashMap}
 import javax.servlet.http.{HttpServletRequestWrapper, HttpServletRequest, HttpServletResponse}
 import collection.Iterable
 import java.lang.String
+import servlet.ServletKernel
+import core.{Handler, Initializable}
 
 /** FileUploadSupport can be mixed into a [[org.scalatra.ScalatraFilter]] or [[org.scalatra.ScalatraServlet]] to provide easy access to data submitted
    * as part of a multipart HTTP request.  Commonly this is used for retrieving uploaded files.
@@ -19,10 +21,11 @@ import java.lang.String
    *
    * @note Once any handler with FileUploadSupport has accessed the request, the fileParams returned by FileUploadSupport will remain fixed for
    * the lifetime of the request. */
-trait FileUploadSupport extends ScalatraKernel {
+trait FileUploadSupport extends Handler with Initializable {
+  this: ServletKernel =>
   import FileUploadSupport._
 
-  override def handle(req: HttpServletRequest, resp: HttpServletResponse) {
+  abstract override def handle(req: HttpServletRequest, resp: HttpServletResponse) {
     val req2 =
       if (ServletFileUpload.isMultipartContent(req)) {
         val bodyParams = extractMultipartParams(req)
