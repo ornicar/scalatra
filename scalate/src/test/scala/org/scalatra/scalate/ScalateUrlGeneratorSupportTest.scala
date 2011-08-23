@@ -15,6 +15,14 @@ class ScalateUrlGeneratorSupportTest extends Specification {
     val singleNamed = get("/foo/:bar") { }
   }
 
+  val otherServlet = new ScalatraServlet with ScalateSupport with ScalateUrlGeneratorSupport {
+
+    val rock = get("/guitars") { }
+  }
+
+  GlobalRouteRegistry.register(servlet)
+  GlobalRouteRegistry.register(otherServlet)
+
   "Routes extracted from the servlet" should {
     "exist" in {
       servlet.reflectRoutes must haveValue(servlet.simpleString)
@@ -23,6 +31,13 @@ class ScalateUrlGeneratorSupportTest extends Specification {
     "be indexed by their names" in {
       servlet.reflectRoutes must havePair("simpleString" -> servlet.simpleString)
       servlet.reflectRoutes must havePair("singleNamed" -> servlet.singleNamed)
+    }
+  }
+
+  "The global route registry" should {
+    "contain all routes" in {
+      GlobalRouteRegistry.routes  must havePair("singleNamed" -> servlet.singleNamed)
+      GlobalRouteRegistry.routes  must havePair("rock" -> otherServlet.rock)
     }
   }
 }
